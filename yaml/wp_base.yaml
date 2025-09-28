@@ -161,7 +161,7 @@ external_components:
 climate:
   - platform: custom
     lambda: |-
-      auto heating = new Heating(id(RAUMISTTEMP),id(RAUMSOLLTEMP_TAG), id(HEIZEN), id(KUEHLEN), id(LUEFTUNG), Property::kRAUMSOLLTEMP_TAG, Property::kKUEHL_RAUMSOLL_TAG);
+      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_DAY), id(HEIZEN), id(KUEHLEN), id(LUEFTUNG), Property::kROOM_TEMP_SETPOINT_DAY, Property::kCOOLING_ROOM_SETPOINT_DAY);
       App.register_component(heating);
       return {heating};
     climates:
@@ -175,7 +175,7 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto heating = new Heating(id(RAUMISTTEMP),id(RAUMSOLLTEMP_NACHT), id(HEIZEN), id(KUEHLEN), id(LUEFTUNG), Property::kRAUMSOLLTEMP_NACHT, Property::kKUEHL_RAUMSOLL_NACHT);
+      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_NIGHT), id(HEIZEN), id(KUEHLEN), id(LUEFTUNG), Property::kROOM_TEMP_SETPOINT_NIGHT, Property::kKUEHL_RAUMSOLL_NACHT);
       App.register_component(heating);
       return {heating};
     climates:
@@ -189,7 +189,7 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(SPEICHERSOLLTEMP_TAG), id(WARMWASSERBEREITUNG), Property::kSPEICHERSOLLTEMP_TAG);
+      auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(STORAGE_TEMP_SETPOINT_DAY), id(WARMWASSERBEREITUNG), Property::kSTORAGE_TEMP_SETPOINT_DAY);
       App.register_component(hot_water);
       return {hot_water};
     climates:
@@ -203,7 +203,7 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(SPEICHERSOLLTEMP_NACHT), id(WARMWASSERBEREITUNG), Property::kSPEICHERSOLLTEMP_NACHT);
+      auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(STORAGE_TEMP_SETPOINT_NIGHT), id(WARMWASSERBEREITUNG), Property::kSTORAGE_TEMP_SETPOINT_NIGHT);
       App.register_component(hot_water);
       return {hot_water};
     climates:
@@ -250,14 +250,14 @@ packages:
   SOMMERBETRIEB_AKTIV:                 !include { file: wp_binary.yaml, vars: { name: "SOMMERBETRIEB_AKTIV" }}
   OFEN_KAMIN_AKTIV:                    !include { file: wp_binary.yaml, vars: { name: "OFEN_KAMIN_AKTIV" }}
 
-  ABLUFTTEMP:                          !include { file: wp_temperature.yaml, vars: { property: "ABLUFTTEMP"  }}
-  SPEICHERSOLLTEMP_TAG:                !include { file: wp_temperature.yaml, vars: { property: "SPEICHERSOLLTEMP_TAG"   , writable: "true" }}
-  SPEICHERSOLLTEMP_NACHT:              !include { file: wp_temperature.yaml, vars: { property: "SPEICHERSOLLTEMP_NACHT" , writable: "true" }}
-  SAMMLERISTTEMP:                      !include { file: wp_temperature.yaml, vars: { property: "SAMMLERISTTEMP"         , update_interval: $interval_medium }}
+  EXHAUST_AIR_TEMP:                    !include { file: wp_temperature.yaml, vars: { property: "EXHAUST_AIR_TEMP"  }}
+  STORAGE_TEMP_SETPOINT_DAY:           !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_SETPOINT_DAY"   , writable: "true" }}
+  STORAGE_TEMP_SETPOINT_NIGHT:         !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_SETPOINT_NIGHT" , writable: "true" }}
+  COLLECTOR_TEMP_ACTUAL:               !include { file: wp_temperature.yaml, vars: { property: "COLLECTOR_TEMP_ACTUAL"         , update_interval: $interval_medium }}
   TAUPUNKT_HK1:                        !include { file: wp_temperature.yaml, vars: { property: "TAUPUNKT_HK1"           , target: "HK1" }}
-  RAUMSOLLTEMP_TAG:                    !include { file: wp_temperature.yaml, vars: { property: "RAUMSOLLTEMP_TAG"       , target: "HK1" , writable: "true" }}
-  RAUMSOLLTEMP_NACHT:                  !include { file: wp_temperature.yaml, vars: { property: "RAUMSOLLTEMP_NACHT"     , target: "HK1" , writable: "true" }}
-  KUEHL_RAUMSOLL_TAG:                  !include { file: wp_temperature.yaml, vars: { property: "KUEHL_RAUMSOLL_TAG"     , target: "HK1" , writable: "true" }}
+  ROOM_TEMP_SETPOINT_DAY:              !include { file: wp_temperature.yaml, vars: { property: "ROOM_TEMP_SETPOINT_DAY"       , target: "HK1" , writable: "true" }}
+  ROOM_TEMP_SETPOINT_NIGHT:            !include { file: wp_temperature.yaml, vars: { property: "ROOM_TEMP_SETPOINT_NIGHT"     , target: "HK1" , writable: "true" }}
+  COOLING_ROOM_SETPOINT_DAY:           !include { file: wp_temperature.yaml, vars: { property: "COOLING_ROOM_SETPOINT_DAY"     , target: "HK1" , writable: "true" }}
   EVAPORATOR_TEMP:                     !include { file: wp_temperature.yaml, vars: { property: "EVAPORATOR_TEMP"  }}
 
   LUEFT_STUFE_TAG:                     !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_TAG"   }}
@@ -314,14 +314,14 @@ packages:
   WAERMEERTRAG_WW_SUMME_MWH:           !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_WW_SUMME_MWH"   , scaled_property: "WAERMEERTRAG_WW_SUM_KWH"   , property: "WAERMEERTRAG_WW_SUM_MWH"   , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
   WAERMEERTRAG_HEIZ_SUMME_MWH:         !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_HEIZ_SUMME_MWH" , scaled_property: "WAERMEERTRAG_HEIZ_SUM_KWH" , property: "WAERMEERTRAG_HEIZ_SUM_MWH" , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
 
-  SPEICHERSOLLTEMP:                    !include { file: wp_temperature.yaml, vars: { property: "SPEICHERSOLLTEMP"          }}
+  STORAGE_TEMP_SETPOINT:               !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_SETPOINT"          }}
   STORAGE_TEMP_ACTUAL:                 !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_ACTUAL"      , update_interval: $interval_medium }}
   OUTSIDE_TEMP:                        !include { file: wp_temperature.yaml, vars: { property: "OUTSIDE_TEMP"     }}
   RETURN_TEMP_ACTUAL:                  !include { file: wp_temperature.yaml, vars: { property: "RETURN_TEMP_ACTUAL"       , update_interval: $interval_medium }}
   FLOW_TEMP_ACTUAL:                    !include { file: wp_temperature.yaml, vars: { property: "FLOW_TEMP_ACTUAL"         , update_interval: $interval_medium, target: "HK1" }}
-  RAUMISTTEMP:                         !include { file: wp_temperature.yaml, vars: { property: "RAUMISTTEMP"              , target: "HK1" }}
-  VERSTELLTE_RAUMSOLLTEMP:             !include { file: wp_temperature.yaml, vars: { property: "VERSTELLTE_RAUMSOLLTEMP"  , target: "HK1" }}
-  VORLAUFSOLLTEMP:                     !include { file: wp_temperature.yaml, vars: { property: "VORLAUFSOLLTEMP"          , target: "HK1" }}
+  ROOM_TEMP_ACTUAL:                    !include { file: wp_temperature.yaml, vars: { property: "ROOM_TEMP_ACTUAL"              , target: "HK1" }}
+  ADJUSTED_ROOM_TEMP_SETPOINT:         !include { file: wp_temperature.yaml, vars: { property: "ADJUSTED_ROOM_TEMP_SETPOINT"  , target: "HK1" }}
+  FLOW_TEMP_SETPOINT:                  !include { file: wp_temperature.yaml, vars: { property: "FLOW_TEMP_SETPOINT"          , target: "HK1" }}
 
   FEHLERMELDUNG:                       !include { file: wp_generic.yaml, vars: { property: "FEHLERMELDUNG"      , icon: "mdi:alert-circle" }}
   RAUMFEUCHTE:                         !include { file: wp_generic.yaml, vars: { property: "RAUMFEUCHTE"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}

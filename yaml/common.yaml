@@ -44,7 +44,7 @@ substitutions:
 #                                       #
 #########################################
 globals:
-  - id: gRAUMISTTEMP
+  - id: gROOM_TEMP_ACTUAL
     type: float
     initial_value: "0.0"
   - id: gRAUMFEUCHTE
@@ -152,11 +152,11 @@ interval:
   - interval: $interval_medium
     then:
       - lambda: |-
-          // Send current RAUMISTTEMP
-          const auto room_temp = id(gRAUMISTTEMP);
+          // Send current ROOM_TEMP_ACTUAL
+          const auto room_temp = id(gROOM_TEMP_ACTUAL);
           if(room_temp > 0.0f) {
             ESP_LOGI("SET", "Sending cached room temperature %f to heatpump", room_temp);
-            sendData(HK1, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+            sendData(HK1, Property::kROOM_TEMP_ACTUAL, static_cast<std::uint16_t>(room_temp * 10.0f));
           }
           // Send current RAUMFEUCHTE
           const auto humidity = id(gRAUMFEUCHTE);
@@ -224,7 +224,7 @@ sensor:
       then:
         - lambda: |-
             ESP_LOGI("SET", "Updating room temperature to %f", x);
-            id(gRAUMISTTEMP) = x;
+            id(gROOM_TEMP_ACTUAL) = x;
 
   - platform: homeassistant
     name: "Humidity Sensor From Home Assistant"
