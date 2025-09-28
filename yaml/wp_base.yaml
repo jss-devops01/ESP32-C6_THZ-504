@@ -64,7 +64,7 @@ esphome:
           CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
             const std::bitset<15U> status_bits{static_cast<std::uint16_t>(value)};
             id(SCHALTPROGRAMM_AKTIV).publish_state(status_bits.test(0U));
-            id(VERDICHTER).publish_state(status_bits.test(1U));
+            id(COMPRESSOR).publish_state(status_bits.test(1U));
             id(HEIZEN).publish_state(status_bits.test(2U));
             id(KUEHLEN).publish_state(status_bits.test(3U));
             id(WARMWASSERBEREITUNG).publish_state(status_bits.test(4U));
@@ -233,7 +233,7 @@ interval:
 #########################################
 packages:
   SCHALTPROGRAMM_AKTIV:                !include { file: wp_binary.yaml, vars: { name: "SCHALTPROGRAMM_AKTIV" }}
-  VERDICHTER:                          !include { file: wp_binary.yaml, vars: { name: "VERDICHTER" }}
+  COMPRESSOR:                          !include { file: wp_binary.yaml, vars: { name: "COMPRESSOR" }}
   WARMWASSERBEREITUNG:                 !include { file: wp_binary.yaml, vars: { name: "WARMWASSERBEREITUNG" }}
   ELEKTRISCHE_NACHERWAERMUNG:          !include { file: wp_binary.yaml, vars: { name: "ELEKTRISCHE_NACHERWAERMUNG" }}
   SERVICE:                             !include { file: wp_binary.yaml, vars: { name: "SERVICE" }}
@@ -267,8 +267,8 @@ packages:
   EXHAUST_AIR_HUMIDITY:                !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_HUMIDITY"            , update_interval: $interval_very_slow       , unit: "%"    , icon: "mdi:water-percent"}}
   MOTORSTROM:                          !include { file: wp_generic.yaml, vars: { property: "MOTORSTROM"               , update_interval: $interval_medium          , unit: "A"    , icon: "mdi:current-ac"}}
   MOTORSPANNUNG:                       !include { file: wp_generic.yaml, vars: { property: "MOTORSPANNUNG"            , update_interval: $interval_medium          , unit: "V"    , icon: "mdi:sine-wave"}}
-  MOTORLEISTUNG:                       !include { file: wp_generic.yaml, vars: { property: "MOTORLEISTUNG"            , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:flash", accuracy_decimals: "2" }}
-  VERDICHTERDREHZAHL:                  !include { file: wp_generic.yaml, vars: { property: "VERDICHTERDREHZAHL"       , update_interval: $interval_medium          , unit: "Hz"   , icon: "mdi:gauge" }}
+  MOTOR_POWER:                         !include { file: wp_generic.yaml, vars: { property: "MOTOR_POWER"              , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:flash", accuracy_decimals: "2" }}
+  COMPRESSOR_SPEED:                    !include { file: wp_generic.yaml, vars: { property: "COMPRESSOR_SPEED"         , update_interval: $interval_medium          , unit: "Hz"   , icon: "mdi:gauge" }}
   HEIZLEISTUNG_RELATIV:                !include { file: wp_generic.yaml, vars: { property: "HEIZLEISTUNG_RELATIV"     , update_interval: $interval_medium          , unit: "%"    , icon: "mdi:gauge" }}
   HEIZ_KUEHL_LEISTUNG:                 !include { file: wp_generic.yaml, vars: { property: "HEIZ_KUEHL_LEISTUNG"      , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:home-lightning-bolt-outline", accuracy_decimals: "2" }}
   EXHAUST_AIR_ACTUAL:                  !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_ACTUAL"               , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
@@ -281,10 +281,10 @@ packages:
   LAUFZEIT_FILTER:                     !include { file: wp_generic.yaml, vars: { property: "LAUFZEIT_FILTER"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
   ANZEIGE_NIEDERDRUCK:                 !include { file: wp_generic.yaml, vars: { property: "ANZEIGE_NIEDERDRUCK"      , accuracy_decimals: "2" }}
   PUMPENZYKLEN_MIN_AUSSENT:            !include { file: wp_generic.yaml, vars: { property: "PUMPENZYKLEN_MIN_AUSSENT" , icon: "mdi:numeric"  }}
-  SOLLWERT_MAX_HK1:                    !include { file: wp_generic.yaml, vars: { property: "SOLLWERT_MAX_HK1"         , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
-  SOLLWERT_MIN_HK1:                    !include { file: wp_generic.yaml, vars: { property: "SOLLWERT_MIN_HK1"         , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
-  ANTEIL_VORLAUF_HK1:                  !include { file: wp_generic.yaml, vars: { property: "ANTEIL_VORLAUF_HK1"       , unit: "%" , icon: "mdi:percent-box"         , target: "HK1" }}
-  FUSSPUNKT_HK1:                       !include { file: wp_generic.yaml, vars: { property: "FUSSPUNKT_HK1"            , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
+  SETPOINT_MAX_HC1:                    !include { file: wp_generic.yaml, vars: { property: "SETPOINT_MAX_HC1"          , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
+  SETPOINT_MIN_HC1:                    !include { file: wp_generic.yaml, vars: { property: "SETPOINT_MIN_HC1"          , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
+  FLOW_SHARE_HC1:                      !include { file: wp_generic.yaml, vars: { property: "FLOW_SHARE_HC1"            , unit: "%" , icon: "mdi:percent-box"         , target: "HK1" }}
+  BASE_POINT_HC1:                      !include { file: wp_generic.yaml, vars: { property: "BASE_POINT_HC1"             , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
 
   NE_STUFE_WW:                         !include { file: wp_number.yaml, vars: { property: "NE_STUFE_WW"                , min: "0" , max: "3"  }}
   LEISTUNG_AUSLEGUNG_HEIZUNG:          !include { file: wp_number.yaml, vars: { property: "LEISTUNG_AUSLEGUNG_HEIZUNG" , min: "40", max: "100"}}
@@ -293,7 +293,7 @@ packages:
   HYSTERESE_WW:                        !include { file: wp_number.yaml, vars: { property: "HYSTERESE_WW"               , min: "2.0", max: "10.0", step: "0.1", unit: "°C" }}
   VENT_SUPPLY_LEVEL1:                  !include { file: wp_number.yaml, vars: { property: "VENT_SUPPLY_LEVEL1", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
   VENT_SUPPLY_LEVEL2:                  !include { file: wp_number.yaml, vars: { property: "VENT_SUPPLY_LEVEL2", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
-  LUEFT_ZULUFT_STUFE3:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ZULUFT_STUFE3", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
+  VENT_SUPPLY_LEVEL3:                  !include { file: wp_number.yaml, vars: { property: "VENT_SUPPLY_LEVEL3", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
   VENT_EXHAUST_LEVEL1:                 !include { file: wp_number.yaml, vars: { property: "VENT_EXHAUST_LEVEL1", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
   VENT_EXHAUST_LEVEL2:                 !include { file: wp_number.yaml, vars: { property: "VENT_EXHAUST_LEVEL2", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
   VENT_EXHAUST_LEVEL3:                 !include { file: wp_number.yaml, vars: { property: "VENT_EXHAUST_LEVEL3", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
@@ -310,7 +310,7 @@ packages:
   KUEHLMODE:                           !include { file: wp_switch.yaml, vars: { property: "KUEHLMODE" , target: "HK1" }}
 
   # Additional sensors originally from common.yaml to avoid duplicates
-  VERDICHTER_STARTS:                   !include { file: wp_generic_combined.yaml, vars: { sensor_name: "VERDICHTER_STARTS"           , scaled_property: "VERDICHTER_STARTS_K"       , property: "VERDICHTER_STARTS"         , unit: ""   , accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
+  COMPRESSOR_STARTS:                   !include { file: wp_generic_combined.yaml, vars: { sensor_name: "COMPRESSOR_STARTS"           , scaled_property: "VERDICHTER_STARTS_K"       , property: "COMPRESSOR_STARTS"         , unit: ""   , accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
   WAERMEERTRAG_WW_SUMME_MWH:           !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_WW_SUMME_MWH"   , scaled_property: "WAERMEERTRAG_WW_SUM_KWH"   , property: "WAERMEERTRAG_WW_SUM_MWH"   , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
   WAERMEERTRAG_HEIZ_SUMME_MWH:         !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_HEIZ_SUMME_MWH" , scaled_property: "WAERMEERTRAG_HEIZ_SUM_KWH" , property: "WAERMEERTRAG_HEIZ_SUM_MWH" , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
 
@@ -325,7 +325,7 @@ packages:
 
   FEHLERMELDUNG:                       !include { file: wp_generic.yaml, vars: { property: "FEHLERMELDUNG"      , icon: "mdi:alert-circle" }}
   ROOM_HUMIDITY:                       !include { file: wp_generic.yaml, vars: { property: "ROOM_HUMIDITY"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
-  STEIGUNG_HK1:                        !include { file: wp_generic.yaml, vars: { property: "STEIGUNG_HK1"       , icon: "mdi:valve", target: "HK1", accuracy_decimals: "2" }}
+  SLOPE_HC1:                           !include { file: wp_generic.yaml, vars: { property: "SLOPE_HC1"            , icon: "mdi:valve", target: "HK1", accuracy_decimals: "2" }}
 
   RAUMEINFLUSS:                        !include { file: wp_number.yaml, vars: { property: "RAUMEINFLUSS", target: "HK1" }}
 
