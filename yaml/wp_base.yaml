@@ -1,0 +1,168 @@
+esphome:
+  on_boot:
+    priority: 100.0 # AFTER_CONNECTION
+    then:
+      - lambda: |-
+          #include <bitset>
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kPASSIVKUEHLUNG),[](const SimpleVariant& value){
+            const auto stringValue{Mapper::instance().getPassivkuehlung(value).value_or("Unbekannt")};
+            const auto index = id(PASSIVKUEHLUNG).index_of(stringValue);
+            if(index.has_value()) {
+              id(PASSIVKUEHLUNG).publish_state(stringValue);
+            }
+          });
+          scheduleRequest(Kessel, Property::kPASSIVKUEHLUNG, std::chrono::seconds(10));
+
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kZULUFT_IST),[](const SimpleVariant& value){
+            // workaround for broken ninth bit of BETRIEBSSTATUS
+            const auto zuluftIst = static_cast<std::uint16_t>(value);
+            id(LUEFTUNG).publish_state(zuluftIst > 0U);
+          });
+          scheduleRequest(Kessel, Property::kZULUFT_IST, std::chrono::seconds(10));
+
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kPROGRAMMSCHALTER),[](const SimpleVariant& value){
+            const auto stringValue{value.get<std::string>()};
+            const auto index = id(PROGRAMMSCHALTER).index_of(stringValue);
+            if(index.has_value()) {
+              id(PROGRAMMSCHALTER).publish_state(stringValue);
+            }
+          });
+          scheduleRequest(Kessel, Property::kPROGRAMMSCHALTER, std::chrono::seconds(10));
+
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS_2),[](const SimpleVariant& value){
+            const std::bitset<2U> status_bits{static_cast<std::uint16_t>(value)};
+            id(SOMMERBETRIEB_AKTIV).publish_state(status_bits.test(0U));
+            id(OFEN_KAMIN_AKTIV).publish_state(status_bits.test(1U));
+          });
+          scheduleRequest(Kessel, Property::kBETRIEBS_STATUS_2, std::chrono::seconds(10));
+
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
+            const std::bitset<15U> status_bits{static_cast<std::uint16_t>(value)};
+            id(SCHALTPROGRAMM_AKTIV).publish_state(status_bits.test(0U));
+            id(VERDICHTER).publish_state(status_bits.test(1U));
+            id(HEIZEN).publish_state(status_bits.test(2U));
+            id(KUEHLEN).publish_state(status_bits.test(3U));
+            id(WARMWASSERBEREITUNG).publish_state(status_bits.test(4U));
+            id(ELEKTRISCHE_NACHERWAERMUNG).publish_state(status_bits.test(5U));
+            id(SERVICE).publish_state(status_bits.test(6U));
+            id(EVU_SPERRE).publish_state(status_bits.test(7U));
+            id(FILTERWECHSEL_BEIDE).publish_state(status_bits.test(8U));
+            // seems to be broken id(LUEFTUNG).publish_state(status_bits.test(9U));
+            id(HEIZKREISPUMPE).publish_state(status_bits.test(10U));
+            id(ABTAUEN_VERDAMPFER).publish_state(status_bits.test(11U));
+            id(FILTERWECHSEL_ABLUFT).publish_state(status_bits.test(12U));
+            id(FILTERWECHSEL_ZULUFT).publish_state(status_bits.test(13U));
+            id(AUFHEIZPROGRAMM_AKTIV).publish_state(status_bits.test(14U));
+          });
+          scheduleRequest(Kessel, Property::kBETRIEBS_STATUS, std::chrono::seconds(10));
+
+#########################################
+#                                       #
+#   Selects                             #
+#                                       #
+#########################################
+select:
+  - platform: template
+    name: "PASSIVKUEHLUNG"
+    id: PASSIVKUEHLUNG
+    options:
+      - "Aus"
+      - "Ablüften"
+      - "Zulüften"
+      - "Bypass"
+      - "Sommerkassette"
+      - "Unbekannt"
+    initial_option: "Unbekannt"
+    optimistic: true
+    setup_priority: 100
+    set_action:
+      then:
+        - lambda: |-
+            const auto passivkuehlungId = Mapper::instance().getPassivkuehlungId(x);
+            if(passivkuehlungId.has_value()) {
+              sendData(Kessel, Property::kPASSIVKUEHLUNG, passivkuehlungId.value());
+            }
+
+  - platform: template
+    name: "PROGRAMMSCHALTER"
+    id: PROGRAMMSCHALTER
+    options:
+      - "Notbetrieb"
+      - "Bereitschaft"
+      - "Automatik"
+      - "Tagbetrieb"
+      - "Absenkbetrieb"
+      - "Warmwasser"
+      - "Handbetrieb"
+      - "Unbekannt"
+    initial_option: "Unbekannt"
+    optimistic: true
+    setup_priority: 100
+    set_action:
+      then:
+        - lambda: |-
+            const auto betriebsartId = Mapper::instance().getBetriebsartId(x);
+            if(betriebsartId.has_value()) {
+              sendData(Kessel, Property::kPROGRAMMSCHALTER, betriebsartId.value());
+            }
+
+#########################################
+#                                       #
+#   Intervals                           #
+#                                       #
+#########################################
+interval:
+  - interval: $interval_once_in_a_while
+    then:
+    - lambda: |-
+        queueRequest(Kessel, Property::kBETRIEBS_STATUS_2);
+
+#########################################
+#                                       #
+#   Packages                            #
+#                                       #
+#########################################
+packages:
+  SCHALTPROGRAMM_AKTIV:                !include { file: wp_binary.yaml, vars: { name: "SCHALTPROGRAMM_AKTIV" }}
+  VERDICHTER:                          !include { file: wp_binary.yaml, vars: { name: "VERDICHTER" }}
+  WARMWASSERBEREITUNG:                 !include { file: wp_binary.yaml, vars: { name: "WARMWASSERBEREITUNG" }}
+  ELEKTRISCHE_NACHERWAERMUNG:          !include { file: wp_binary.yaml, vars: { name: "ELEKTRISCHE_NACHERWAERMUNG" }}
+  SERVICE:                             !include { file: wp_binary.yaml, vars: { name: "SERVICE" }}
+  HEIZEN:                              !include { file: wp_binary.yaml, vars: { name: "HEIZEN" }}
+  KUEHLEN:                             !include { file: wp_binary.yaml, vars: { name: "KUEHLEN" }}
+  LUEFTUNG:                            !include { file: wp_binary.yaml, vars: { name: "LUEFTUNG" }}
+  EVU_SPERRE:                          !include { file: wp_binary.yaml, vars: { name: "EVU_SPERRE" }}
+  FILTERWECHSEL_BEIDE:                 !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_BEIDE" }}
+  HEIZKREISPUMPE:                      !include { file: wp_binary.yaml, vars: { name: "HEIZKREISPUMPE" }}
+  ABTAUEN_VERDAMPFER:                  !include { file: wp_binary.yaml, vars: { name: "ABTAUEN_VERDAMPFER" }}
+  FILTERWECHSEL_ABLUFT:                !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_ABLUFT" }}
+  FILTERWECHSEL_ZULUFT:                !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_ZULUFT" }}
+  AUFHEIZPROGRAMM_AKTIV:               !include { file: wp_binary.yaml, vars: { name: "AUFHEIZPROGRAMM_AKTIV" }}
+  SOMMERBETRIEB_AKTIV:                 !include { file: wp_binary.yaml, vars: { name: "SOMMERBETRIEB_AKTIV" }}
+  OFEN_KAMIN_AKTIV:                    !include { file: wp_binary.yaml, vars: { name: "OFEN_KAMIN_AKTIV" }}
+
+  ABLUFTTEMP:                          !include { file: wp_temperature.yaml, vars: { property: "ABLUFTTEMP"  }}
+  SPEICHERSOLLTEMP_TAG:                !include { file: wp_temperature_writable.yaml, vars: { property: "SPEICHERSOLLTEMP_TAG" }}
+  SPEICHERSOLLTEMP_NACHT:              !include { file: wp_temperature_writable.yaml, vars: { property: "SPEICHERSOLLTEMP_NACHT" }}
+  VERDAMPFERTEMP:                      !include { file: wp_temperature.yaml, vars: { property: "VERDAMPFERTEMP"  }}
+  RAUMISTTEMP:                         !include { file: wp_temperature.yaml, vars: { property: "RAUMISTTEMP"              , target: "HK1" }}
+  RAUMSOLLTEMP_TAG:                    !include { file: wp_temperature_writable.yaml, vars: { property: "RAUMSOLLTEMP_TAG", target: "HK1" }}
+  RAUMSOLLTEMP_NACHT:                  !include { file: wp_temperature_writable.yaml, vars: { property: "RAUMSOLLTEMP_NACHT", target: "HK1" }}
+  KUEHL_RAUMSOLL_TAG:                  !include { file: wp_temperature_writable.yaml, vars: { property: "KUEHL_RAUMSOLL_TAG", target: "HK1" }}
+  SPEICHERISTTEMP:                     !include { file: wp_temperature.yaml, vars: { property: "SPEICHERISTTEMP"          , update_interval: $interval_medium }}
+
+  ABLUFT_SOLL:                         !include { file: wp_generic.yaml, vars: { property: "ABLUFT_SOLL"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
+  ZULUFT_SOLL:                         !include { file: wp_generic.yaml, vars: { property: "ZULUFT_SOLL"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
+  ABLUFT_IST:                          !include { file: wp_generic.yaml, vars: { property: "ABLUFT_IST"               , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
+  ZULUFT_IST:                          !include { file: wp_generic.yaml, vars: { property: "ZULUFT_IST"               , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
+  MOTORSTROM:                          !include { file: wp_generic.yaml, vars: { property: "MOTORSTROM"               , update_interval: $interval_medium          , unit: "A"    , icon: "mdi:current-ac"}}
+  MOTORSPANNUNG:                       !include { file: wp_generic.yaml, vars: { property: "MOTORSPANNUNG"            , update_interval: $interval_medium          , unit: "V"    , icon: "mdi:sine-wave"}}
+  MOTORLEISTUNG:                       !include { file: wp_generic.yaml, vars: { property: "MOTORLEISTUNG"            , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:flash", accuracy_decimals: "2" }}
+  VERDICHTERDREHZAHL:                  !include { file: wp_generic.yaml, vars: { property: "VERDICHTERDREHZAHL"       , update_interval: $interval_medium          , unit: "Hz"   , icon: "mdi:gauge" }}
+  HEIZLEISTUNG_RELATIV:                !include { file: wp_generic.yaml, vars: { property: "HEIZLEISTUNG_RELATIV"     , update_interval: $interval_medium          , unit: "%"    , icon: "mdi:gauge" }}
+  HEIZ_KUEHL_LEISTUNG:                 !include { file: wp_generic.yaml, vars: { property: "HEIZ_KUEHL_LEISTUNG"      , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:home-lightning-bolt-outline", accuracy_decimals: "2" }}
+
+  NE_STUFE_WW:                         !include { file: wp_number.yaml, vars: { property: "NE_STUFE_WW"                , min: "0" , max: "3"  }}
+
+  WARMWASSER_ECO:                      !include { file: wp_switch.yaml, vars: { property: "WARMWASSER_ECO", icon: "mdi:sprout" }}
+  KUEHLMODE:                           !include { file: wp_switch.yaml, vars: { property: "KUEHLMODE" , target: "HK1" }}

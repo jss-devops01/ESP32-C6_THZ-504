@@ -1,0 +1,12 @@
+sensor:
+  - platform: template
+    name: "${property}"
+    id: ${property}
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    device_class: temperature
+    state_class: measurement
+    icon: "mdi:thermometer"
+    update_interval: ${update_interval:$interval_fast}
+    lambda: |-
+      return {};  // Updated via CAN bus callbacks

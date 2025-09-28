@@ -1,0 +1,16 @@
+number:
+  - platform: template
+    name: "${property}"
+    id: ${property}
+    unit_of_measurement: "${unit:}"
+    min_value: ${min:0}
+    max_value: ${max:100}
+    step: ${step:1}
+    mode: box
+    optimistic: true
+    icon: "${icon:mdi:numeric}"
+    set_action:
+      then:
+        - lambda: |-
+            const auto value = static_cast<std::uint16_t>(x);
+            sendData(${target:Kessel}, Property::k${property}, value);

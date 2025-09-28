@@ -1,0 +1,95 @@
+esphome:
+  name: esp32-c6-thz504
+  friendly_name: ESP32-C6 THZ-504
+  platformio_options:
+    build_flags:
+      - "-std=gnu++2a"
+      - "-DTHZ_504"
+    build_unflags:
+      - "-std=gnu++11"
+      - "-fno-rtti"
+
+esp32:
+  board: esp32-c6-devkitc-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: INFO
+  baud_rate: 115200
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "ESP32-C6-THZ504 Fallback Hotspot"
+    password: !secret ap_password
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+substitutions:
+  interval_very_fast: 15s
+  interval_fast: 30s
+  interval_medium: 60s
+  interval_slow: 5min
+  interval_very_slow: 15min
+  interval_once_in_a_while: 1h
+
+  entity_room_temperature: "sensor.living_room_temperature"
+  entity_humidity: "sensor.living_room_humidity"
+
+#########################################
+#                                       #
+#   SPI configuration                   #
+#                                       #
+#########################################
+spi:
+  id: McpSpi
+  clk_pin: GPIO6
+  mosi_pin: GPIO7
+  miso_pin: GPIO2
+
+#########################################
+#                                       #
+#   CAN configuration                   #
+#                                       #
+#########################################
+canbus:
+  - id: !extend wp_can
+    platform: mcp2515
+    spi_id: McpSpi
+    cs_pin: GPIO10
+    bit_rate: 20kbps
+
+#########################################
+#                                       #
+#   Buttons                             #
+#                                       #
+#########################################
+button:
+  - platform: restart
+    name: "Restart ESP32-C6 THZ-504"
+
+#########################################
+#                                       #
+#   Packages                            #
+#                                       #
+#########################################
+packages:
+  thz504: !include yaml/thz504.yaml

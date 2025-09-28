@@ -1,0 +1,11 @@
+sensor:
+  - platform: template
+    name: "${property}"
+    id: ${property}
+    unit_of_measurement: "${unit:}"
+    accuracy_decimals: ${accuracy_decimals:0}
+    state_class: measurement
+    icon: "${icon:mdi:gauge}"
+    update_interval: ${update_interval:$interval_fast}
+    lambda: |-
+      return {};  // Updated via CAN bus callbacks

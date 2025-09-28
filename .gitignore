@@ -1,0 +1,31 @@
+# ESPHome build artifacts
+.esphome/
+.pioenvs/
+.piolibdeps/
+.clang_complete
+.gcc-flags.json
+.pio/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Secrets
+secrets.yaml
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
