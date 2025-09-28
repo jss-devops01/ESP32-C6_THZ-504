@@ -1,6 +1,6 @@
 esphome:
-  name: esp32-poe-technik
-  friendly_name: ESP32-PoE Technik
+  name: esp32-c6-thz504
+  friendly_name: ESP32-C6 THZ-504
   platformio_options:
     build_flags:
       - "-std=gnu++2a"
@@ -9,9 +9,11 @@ esphome:
       - "-fno-rtti"
 
 esp32:
-  board: esp32-poe
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  flash_size: 4MB
   framework:
-    type: arduino
+    type: esp-idf
 
 # Enable logging
 logger:
@@ -45,26 +47,10 @@ substitutions:
 
 #########################################
 #                                       #
-#   SPI configuration                   #
+#   CAN configuration inherited from    #
+#   common.yaml with ESP32-C6 pins      #
 #                                       #
 #########################################
-spi:
-  id: McpSpi
-  clk_pin: GPIO14
-  mosi_pin: GPIO13
-  miso_pin: GPIO4
-
-#########################################
-#                                       #
-#   CAN configuration                   #
-#                                       #
-#########################################
-canbus:
-  - id: !extend wp_can
-    platform: mcp2515
-    spi_id: McpSpi
-    cs_pin: GPIO15
-    bit_rate: 20kbps
 
 #########################################
 #                                       #
@@ -73,22 +59,23 @@ canbus:
 #########################################
 button:
   - platform: restart
-    name: "Restart ESP32-PoE Technik"
+    name: "Restart ESP32-C6 THZ-504"
 
 #########################################
 #                                       #
-#   Ethernet Konfiguration              #
+#   WiFi Configuration                  #
 #                                       #
 #########################################
-ethernet:
-  type: LAN8720
-  mdc_pin: GPIO23
-  mdio_pin: GPIO18
-  clk:
-    pin: GPIO0
-    mode: CLK_OUT
-  phy_addr: 0
-  power_pin: GPIO12
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "ESP32-C6-THZ504 Fallback Hotspot"
+    password: "configesp32"
+
+captive_portal:
 
 #########################################
 #                                       #
@@ -96,13 +83,13 @@ ethernet:
 #                                       #
 #########################################
 packages:
-# energymeter: !include OneESP32ToRuleThemAll/yaml/energymeter.yaml
-# evu: !include OneESP32ToRuleThemAll/yaml/evu.yaml
-# watermeter: !include OneESP32ToRuleThemAll/yaml/watermeter.yaml
-# sensors: !include OneESP32ToRuleThemAll/yaml/sensors.yaml
-# thz404: !include OneESP32ToRuleThemAll/yaml/thz404.yaml
-  thz504: !include OneESP32ToRuleThemAll/yaml/thz504.yaml
-# thz55eco: !include OneESP32ToRuleThemAll/yaml/thz5_5_eco.yaml
-# ttf07: !include OneESP32ToRuleThemAll/yaml/ttf07.yaml
-# wpl13: !include OneESP32ToRuleThemAll/yaml/wpl13.yaml
-# kondensatpumpe: !include OneESP32ToRuleThemAll/yaml/kondensatpumpe.yaml
+# energymeter: !include yaml/energymeter.yaml
+# evu: !include yaml/evu.yaml
+# watermeter: !include yaml/watermeter.yaml
+# sensors: !include yaml/sensors.yaml
+# thz404: !include yaml/thz404.yaml
+  thz504: !include yaml/thz504.yaml
+# thz55eco: !include yaml/thz5_5_eco.yaml
+# ttf07: !include yaml/ttf07.yaml
+# wpl13: !include yaml/wpl13.yaml
+# kondensatpumpe: !include yaml/kondensatpumpe.yaml

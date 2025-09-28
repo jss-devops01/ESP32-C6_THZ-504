@@ -1,15 +1,15 @@
 esphome:
   includes:
-    - OneESP32ToRuleThemAll/src/callback_handler.h
-    - OneESP32ToRuleThemAll/src/communication.h
-    - OneESP32ToRuleThemAll/src/mapper.h
-    - OneESP32ToRuleThemAll/src/mapper.cpp
-    - OneESP32ToRuleThemAll/src/property.h
-    - OneESP32ToRuleThemAll/src/property.cpp
-    - OneESP32ToRuleThemAll/src/simple_variant.h
-    - OneESP32ToRuleThemAll/src/type.h
-    - OneESP32ToRuleThemAll/src/type.cpp
-    - OneESP32ToRuleThemAll/src/util.h
+    - src/callback_handler.h
+    - src/communication.h
+    - src/mapper.h
+    - src/mapper.cpp
+    - src/property.h
+    - src/property.cpp
+    - src/simple_variant.h
+    - src/type.h
+    - src/type.cpp
+    - src/util.h
   platformio_options:
     build_flags:
       - "-DESPCLIENT_ID=$espclient_can_id"
@@ -19,11 +19,24 @@ esphome:
       - "-DHK2_ID=$hk2_can_id"
 
 substitutions:
+  # Timing intervals
+  interval_very_fast: 15s
+  interval_fast: 30s
+  interval_medium: 60s
+  interval_slow: 5min
+  interval_very_slow: 15min
+  interval_once_in_a_while: 1h
+
+  # CAN bus IDs
   kessel_can_id: "0x180"
   hk1_can_id: "0x301"
   hk2_can_id: "0x302"
   manager_can_id: "0x6a1"
   espclient_can_id: "0x6a2"
+
+  # Home Assistant entities
+  entity_room_temperature: "sensor.durchschnittstemperatur_haus_ohne_keller"
+  entity_humidity: "sensor.durchschnitt_luftfeuchtigkeit_haus"
 
 #########################################
 #                                       #
@@ -52,6 +65,12 @@ globals:
 time:
   - platform: sntp
     id: sntp_time
+    timezone: CET-1CEST,M3.5.0,M10.5.0/3
+    update_interval: 15min
+    servers:
+      - 0.pool.ntp.org
+      - 1.pool.ntp.org
+      - 2.pool.ntp.org
     on_time:
       - seconds: 0
         minutes: 0
@@ -59,6 +78,43 @@ time:
         then:
           - lambda: |-
               syncTime();
+      # Energy calculation schedules - every hour, every 5 minutes starting at 4th minute
+      - seconds: 0
+        minutes: 4/5
+        then:
+          - lambda: |-
+              // Queue energy-related property requests for all sensors
+              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_WW_TAG_WH);
+              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_WW_TAG_KWH);
+              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_HEIZ_TAG_WH);
+              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_HEIZ_TAG_KWH);
+              queueRequest(Kessel, Property::kWAERMEERTRAG_WW_TAG_WH);
+              queueRequest(Kessel, Property::kWAERMEERTRAG_WW_TAG_KWH);
+              queueRequest(Kessel, Property::kWAERMEERTRAG_HEIZ_TAG_WH);
+              queueRequest(Kessel, Property::kWAERMEERTRAG_HEIZ_TAG_KWH);
+      # At midnight reset daily energy consumptions and save offsets
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        then:
+          - lambda: |-
+              // Reset daily energy offsets for the next day
+              id(gOFFSET_EL_ENERGIEAUFNAHME_WW_TAG_WH) = id(EL_ENERGIEAUFNAHME_WW_TAG_WH).raw_state * 0.001;
+              id(gOFFSET_EL_ENERGIEAUFNAHME_HEIZ_TAG_WH) = id(EL_ENERGIEAUFNAHME_HEIZ_TAG_WH).raw_state * 0.001;
+              id(gOFFSET_WAERMEERTRAG_WW_TAG_WH) = id(WAERMEERTRAG_WW_TAG_WH).raw_state * 0.001;
+              id(gOFFSET_WAERMEERTRAG_HEIZ_TAG_WH) = id(WAERMEERTRAG_HEIZ_TAG_WH).raw_state * 0.001;
+          - sensor.template.publish:
+              id: EL_ENERGIEAUFNAHME_WW_SUMME_KWH
+              state: 0.0
+          - sensor.template.publish:
+              id: EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH
+              state: 0.0
+          - sensor.template.publish:
+              id: WAERMEERTRAG_WW_TAG_SUMME_KWH
+              state: 0.0
+          - sensor.template.publish:
+              id: WAERMEERTRAG_HEIZ_TAG_SUMME_KWH
+              state: 0.0
 
 #########################################
 #                                       #
@@ -114,32 +170,7 @@ interval:
 #   Packages                            #
 #                                       #
 #########################################
-packages:
-  VERDICHTER_STARTS:                 !include { file: wp_generic_combined.yaml, vars: { sensor_name: "VERDICHTER_STARTS"           , scaled_property: "VERDICHTER_STARTS_K"       , property: "VERDICHTER_STARTS"         , unit: ""   , accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
-  WAERMEERTRAG_WW_SUMME_MWH:         !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_WW_SUMME_MWH"   , scaled_property: "WAERMEERTRAG_WW_SUM_KWH"   , property: "WAERMEERTRAG_WW_SUM_MWH"   , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
-  WAERMEERTRAG_HEIZ_SUMME_MWH:       !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_HEIZ_SUMME_MWH" , scaled_property: "WAERMEERTRAG_HEIZ_SUM_KWH" , property: "WAERMEERTRAG_HEIZ_SUM_MWH" , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
-
-  SPEICHERSOLLTEMP:                  !include { file: wp_temperature.yaml, vars: { property: "SPEICHERSOLLTEMP"          }}
-  SPEICHERISTTEMP:                   !include { file: wp_temperature.yaml, vars: { property: "SPEICHERISTTEMP"          , update_interval: $interval_medium }}
-  AUSSENTEMP:                        !include { file: wp_temperature.yaml, vars: { property: "AUSSENTEMP"       }}
-  RUECKLAUFISTTEMP:                  !include { file: wp_temperature.yaml, vars: { property: "RUECKLAUFISTTEMP"         , update_interval: $interval_medium }}
-  VORLAUFISTTEMP:                    !include { file: wp_temperature.yaml, vars: { property: "VORLAUFISTTEMP"           , update_interval: $interval_medium, target: "HK1" }}
-  RAUMISTTEMP:                       !include { file: wp_temperature.yaml, vars: { property: "RAUMISTTEMP"              , target: "HK1" }}
-  VERSTELLTE_RAUMSOLLTEMP:           !include { file: wp_temperature.yaml, vars: { property: "VERSTELLTE_RAUMSOLLTEMP"  , target: "HK1" }}
-  VORLAUFSOLLTEMP:                   !include { file: wp_temperature.yaml, vars: { property: "VORLAUFSOLLTEMP"          , target: "HK1" }}
-
-  FEHLERMELDUNG:                     !include { file: wp_generic.yaml, vars: { property: "FEHLERMELDUNG"      , icon: "mdi:alert-circle" }}
-  RAUMFEUCHTE:                       !include { file: wp_generic.yaml, vars: { property: "RAUMFEUCHTE"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
-  STEIGUNG_HK1:                      !include { file: wp_generic.yaml, vars: { property: "STEIGUNG_HK1"       , icon: "mdi:valve", target: "HK1", accuracy_decimals: "2" }}
-
-  RAUMEINFLUSS:                      !include { file: wp_number.yaml, vars: { property: "RAUMEINFLUSS", target: "HK1" }}
-
-  EL_ENERGIEAUFNAHME_WW_SUMME_KWH:   !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "EL_ENERGIEAUFNAHME_WW_SUMME_KWH"   , property_wh: "EL_ENERGIEAUFNAHME_WW_TAG_WH"   , property_kwh: "EL_ENERGIEAUFNAHME_WW_TAG_KWH"   }}
-  EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH: !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH" , property_wh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_WH" , property_kwh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_KWH" }}
-  WAERMEERTRAG_WW_TAG_SUMME_KWH:     !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_WW_TAG_SUMME_KWH"     , property_wh: "WAERMEERTRAG_WW_TAG_WH"         , property_kwh: "WAERMEERTRAG_WW_TAG_KWH"         }}
-  WAERMEERTRAG_HEIZ_TAG_SUMME_KWH:   !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_HEIZ_TAG_SUMME_KWH"   , property_wh: "WAERMEERTRAG_HEIZ_TAG_WH"       , property_kwh: "WAERMEERTRAG_HEIZ_TAG_KWH"       }}
-
-  HEATPUMP_DATETIME: !include { file: wp_datetime.yaml }
+# Package includes removed - handled by wp_base.yaml instead to avoid ID conflicts
 
 
 #########################################
@@ -234,11 +265,14 @@ sensor:
 
 #########################################
 #                                       #
-#   CANbus configuration                #
+#   CANbus configuration (ESP32-C6)     #
 #                                       #
 #########################################
 canbus:
   - id: wp_can
+    platform: esp32_can
+    tx_pin: GPIO5
+    rx_pin: GPIO4
     can_id: $espclient_can_id
     use_extended_id: false
     bit_rate: 20kbps

@@ -61,8 +61,8 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(FEHLERMELDUNG, 0x0001);
     PROPERTY(SPEICHERSOLLTEMP, 0x0003, Type::et_dec_val);
     PROPERTY(VORLAUFSOLLTEMP, 0x0004, Type::et_dec_val);
-    PROPERTY(AUSSENTEMP, 0x000c, Type::et_dec_val);
-    PROPERTY(SPEICHERISTTEMP, 0x000e, Type::et_dec_val);
+    PROPERTY(OUTSIDE_TEMP, 0x000c, Type::et_dec_val);
+    PROPERTY(STORAGE_TEMP_ACTUAL, 0x000e, Type::et_dec_val);
     PROPERTY(VERSTELLTE_RAUMSOLLTEMP, 0x0012, Type::et_dec_val);
     PROPERTY(STEIGUNG_HK1, 0x010e, Type::et_cent_val);
     PROPERTY(WOCHENTAG, 0x0121, Type::et_little_endian);
@@ -92,8 +92,8 @@ struct Property : public oe32trta::detail::Property {
 
 #if defined(THZ_504) || defined(THZ_404) || defined(THZ_5_5_ECO) || defined(TTF_07_C)
     PROPERTY(RAUMISTTEMP, 0x0011, Type::et_dec_val);
-    PROPERTY(VERDAMPFERTEMP, 0x0014, Type::et_dec_val);
-    PROPERTY(RUECKLAUFISTTEMP, 0x0016, Type::et_dec_val);
+    PROPERTY(EVAPORATOR_TEMP, 0x0014, Type::et_dec_val);
+    PROPERTY(RETURN_TEMP_ACTUAL, 0x0016, Type::et_dec_val);
     PROPERTY(RAUMFEUCHTE, 0x0075, Type::et_dec_val);
     PROPERTY(RAUMEINFLUSS, 0x010f, Type::et_little_endian);
     PROPERTY(PROGRAMMSCHALTER, 0x0112, Type::et_betriebsart);
@@ -103,7 +103,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(RAUMSOLLTEMP_TAG, 0x0005, Type::et_dec_val);
     PROPERTY(RAUMSOLLTEMP_NACHT, 0x0008, Type::et_dec_val);
     PROPERTY(SAMMLERISTTEMP, 0x000d, Type::et_dec_val);
-    PROPERTY(VORLAUFISTTEMP, 0x000f, Type::et_dec_val);
+    PROPERTY(FLOW_TEMP_ACTUAL, 0x000f, Type::et_dec_val);
     PROPERTY(SPEICHERSOLLTEMP_TAG, 0x0013, Type::et_dec_val);
     PROPERTY(SOLLWERT_MAX_HK1, 0x0028, Type::et_dec_val);
     PROPERTY(SOMMERBETRIEB_TEMP, 0x0116, Type::et_dec_val);
@@ -194,7 +194,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(VOLUMENSTROM, 0x0673, Type::et_cent_val);
     PROPERTY(DRUCK_HEIZKREIS, 0x0674, Type::et_cent_val);
     PROPERTY(QUELLENDRUCK, 0x0675, Type::et_cent_val);
-    PROPERTY(VORLAUFISTTEMP, 0x06a1, Type::et_dec_val);
+    PROPERTY(FLOW_TEMP_ACTUAL, 0x06a1, Type::et_dec_val);
     PROPERTY(KUEHLEN_EINGESCHALTET, 0x06Aa, Type::et_little_bool);
     PROPERTY(LEISTUNG_HEIZKREISPUMPE, 0x070a, Type::et_byte);
     PROPERTY(LEISTUNG_WARMWASSERPUMPE, 0x070b, Type::et_byte);
@@ -224,7 +224,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(VERDICHTER_EINTRITTSTEMP, 0x06d9, Type::et_dec_val);
     PROPERTY(ISTDREHZAHL_VERDICHTER, 0x06eb);
     PROPERTY(SOLLDREHZAHL_VERDICHTER, 0x06ec);
-    PROPERTY(VERDAMPFERTEMP, 0x07a9, Type::et_dec_val);
+    PROPERTY(EVAPORATOR_TEMP, 0x07a9, Type::et_dec_val);
     PROPERTY(FROSTSCHUTZ, 0xfe07, Type::et_dec_val);
     PROPERTY(ANLAGEFROST, 0x0a00, Type::et_dec_val);
     PROPERTY(VERFLUESSIGERTEMP, 0x0a37, Type::et_dec_val);
@@ -260,7 +260,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(SPANNUNG_INVERTER, 0x06b1, Type::et_dec_val);
     PROPERTY(DRUCK_HOCHDRUCK, 0x07a6, Type::et_dec_val);
     PROPERTY(DRUCK_NIEDERDRUCK, 0x07a7, Type::et_dec_val);
-    PROPERTY(VORLAUFISTTEMP, 0xfdf3, Type::et_dec_val);
+    PROPERTY(FLOW_TEMP_ACTUAL, 0xfdf3, Type::et_dec_val);
     PROPERTY(BETRIEBS_STATUS, 0x4ecd);
     PROPERTY(VERDICHTER_STARTS, 0x4ef1);
     PROPERTY(VERDICHTER_STARTS_K, 0x4ef0);
@@ -270,7 +270,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(VORLAUFISTTEMP_NHZ, 0x4f40, Type::et_dec_val);
     PROPERTY(RUECKLAUFISTTEMP_WP, 0x4f43, Type::et_dec_val);
     PROPERTY(LEISTUNG_KUEHLEN, 0x7a40, Type::et_dec_val);
-    PROPERTY(RUECKLAUFISTTEMP, 0xfdf4, Type::et_dec_val);
+    PROPERTY(RETURN_TEMP_ACTUAL, 0xfdf4, Type::et_dec_val);
     PROPERTY(STEIGUNG_HEIZKURVE, 0x4f2b, Type::et_dec_val);
     PROPERTY(STARTTEMPERATUR, 0x4fbe, Type::et_dec_val);
     PROPERTY(STEIGUNG_KUEHLKURVE, 0x4fb9, Type::et_dec_val);

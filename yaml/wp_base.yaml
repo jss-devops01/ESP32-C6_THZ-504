@@ -1,6 +1,6 @@
 esphome:
   includes:
-    - OneESP32ToRuleThemAll/src/custom_climate.h
+    - src/custom_climate.h
   on_boot:
     priority: 100.0 # AFTER_CONNECTION
     then:
@@ -156,7 +156,7 @@ sensor:
 #                                       #
 #########################################
 external_components:
-  - source: OneESP32ToRuleThemAll/components
+  - source: components
 
 climate:
   - platform: custom
@@ -189,7 +189,7 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto hot_water = new HotWater(id(SPEICHERISTTEMP),id(SPEICHERSOLLTEMP_TAG), id(WARMWASSERBEREITUNG), Property::kSPEICHERSOLLTEMP_TAG);
+      auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(SPEICHERSOLLTEMP_TAG), id(WARMWASSERBEREITUNG), Property::kSPEICHERSOLLTEMP_TAG);
       App.register_component(hot_water);
       return {hot_water};
     climates:
@@ -203,7 +203,7 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto hot_water = new HotWater(id(SPEICHERISTTEMP),id(SPEICHERSOLLTEMP_NACHT), id(WARMWASSERBEREITUNG), Property::kSPEICHERSOLLTEMP_NACHT);
+      auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(SPEICHERSOLLTEMP_NACHT), id(WARMWASSERBEREITUNG), Property::kSPEICHERSOLLTEMP_NACHT);
       App.register_component(hot_water);
       return {hot_water};
     climates:
@@ -258,7 +258,7 @@ packages:
   RAUMSOLLTEMP_TAG:                    !include { file: wp_temperature.yaml, vars: { property: "RAUMSOLLTEMP_TAG"       , target: "HK1" , writable: "true" }}
   RAUMSOLLTEMP_NACHT:                  !include { file: wp_temperature.yaml, vars: { property: "RAUMSOLLTEMP_NACHT"     , target: "HK1" , writable: "true" }}
   KUEHL_RAUMSOLL_TAG:                  !include { file: wp_temperature.yaml, vars: { property: "KUEHL_RAUMSOLL_TAG"     , target: "HK1" , writable: "true" }}
-  VERDAMPFERTEMP:                      !include { file: wp_temperature.yaml, vars: { property: "VERDAMPFERTEMP"  }}
+  EVAPORATOR_TEMP:                     !include { file: wp_temperature.yaml, vars: { property: "EVAPORATOR_TEMP"  }}
 
   LUEFT_STUFE_TAG:                     !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_TAG"   }}
   LUEFT_STUFE_NACHT:                   !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_NACHT" }}
@@ -308,3 +308,30 @@ packages:
 
   WARMWASSER_ECO:                      !include { file: wp_switch.yaml, vars: { property: "WARMWASSER_ECO", icon: "mdi:sprout" }}
   KUEHLMODE:                           !include { file: wp_switch.yaml, vars: { property: "KUEHLMODE" , target: "HK1" }}
+
+  # Additional sensors originally from common.yaml to avoid duplicates
+  VERDICHTER_STARTS:                   !include { file: wp_generic_combined.yaml, vars: { sensor_name: "VERDICHTER_STARTS"           , scaled_property: "VERDICHTER_STARTS_K"       , property: "VERDICHTER_STARTS"         , unit: ""   , accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
+  WAERMEERTRAG_WW_SUMME_MWH:           !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_WW_SUMME_MWH"   , scaled_property: "WAERMEERTRAG_WW_SUM_KWH"   , property: "WAERMEERTRAG_WW_SUM_MWH"   , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
+  WAERMEERTRAG_HEIZ_SUMME_MWH:         !include { file: wp_generic_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_HEIZ_SUMME_MWH" , scaled_property: "WAERMEERTRAG_HEIZ_SUM_KWH" , property: "WAERMEERTRAG_HEIZ_SUM_MWH" , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
+
+  SPEICHERSOLLTEMP:                    !include { file: wp_temperature.yaml, vars: { property: "SPEICHERSOLLTEMP"          }}
+  STORAGE_TEMP_ACTUAL:                 !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_ACTUAL"      , update_interval: $interval_medium }}
+  OUTSIDE_TEMP:                        !include { file: wp_temperature.yaml, vars: { property: "OUTSIDE_TEMP"     }}
+  RETURN_TEMP_ACTUAL:                  !include { file: wp_temperature.yaml, vars: { property: "RETURN_TEMP_ACTUAL"       , update_interval: $interval_medium }}
+  FLOW_TEMP_ACTUAL:                    !include { file: wp_temperature.yaml, vars: { property: "FLOW_TEMP_ACTUAL"         , update_interval: $interval_medium, target: "HK1" }}
+  RAUMISTTEMP:                         !include { file: wp_temperature.yaml, vars: { property: "RAUMISTTEMP"              , target: "HK1" }}
+  VERSTELLTE_RAUMSOLLTEMP:             !include { file: wp_temperature.yaml, vars: { property: "VERSTELLTE_RAUMSOLLTEMP"  , target: "HK1" }}
+  VORLAUFSOLLTEMP:                     !include { file: wp_temperature.yaml, vars: { property: "VORLAUFSOLLTEMP"          , target: "HK1" }}
+
+  FEHLERMELDUNG:                       !include { file: wp_generic.yaml, vars: { property: "FEHLERMELDUNG"      , icon: "mdi:alert-circle" }}
+  RAUMFEUCHTE:                         !include { file: wp_generic.yaml, vars: { property: "RAUMFEUCHTE"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
+  STEIGUNG_HK1:                        !include { file: wp_generic.yaml, vars: { property: "STEIGUNG_HK1"       , icon: "mdi:valve", target: "HK1", accuracy_decimals: "2" }}
+
+  RAUMEINFLUSS:                        !include { file: wp_number.yaml, vars: { property: "RAUMEINFLUSS", target: "HK1" }}
+
+  EL_ENERGIEAUFNAHME_WW_SUMME_KWH:     !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "EL_ENERGIEAUFNAHME_WW_SUMME_KWH"   , property_wh: "EL_ENERGIEAUFNAHME_WW_TAG_WH"   , property_kwh: "EL_ENERGIEAUFNAHME_WW_TAG_KWH"   }}
+  EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH:   !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH" , property_wh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_WH" , property_kwh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_KWH" }}
+  WAERMEERTRAG_WW_TAG_SUMME_KWH:       !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_WW_TAG_SUMME_KWH"     , property_wh: "WAERMEERTRAG_WW_TAG_WH"         , property_kwh: "WAERMEERTRAG_WW_TAG_KWH"         }}
+  WAERMEERTRAG_HEIZ_TAG_SUMME_KWH:     !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_HEIZ_TAG_SUMME_KWH"   , property_wh: "WAERMEERTRAG_HEIZ_TAG_WH"       , property_kwh: "WAERMEERTRAG_HEIZ_TAG_KWH"       }}
+
+  HEATPUMP_DATETIME:                   !include { file: wp_datetime.yaml }

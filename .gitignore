@@ -7,3 +7,5 @@
 **/lib/
 **/platformio.ini
 /secrets.yaml
+tmp/
+*.pyc

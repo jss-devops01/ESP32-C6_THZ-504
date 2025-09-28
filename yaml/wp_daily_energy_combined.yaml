@@ -48,24 +48,4 @@ esphome:
           queueRequest(${target}, Property::k${property_wh});
           queueRequest(${target}, Property::k${property_kwh});
 
-time:
-  - platform: sntp
-    on_time:
-      # Every hour, every 5 minutes starting at 4th minute.
-      - seconds: 0
-        minutes: 4/5
-        then:
-          - lambda: |-
-              queueRequest(${target}, Property::k${property_wh});
-              queueRequest(${target}, Property::k${property_kwh});
-      # At midnight reset power consumptions. And save offset for the next day.
-      - seconds: 0
-        minutes: 0
-        hours: 0
-        then:
-          - lambda: |-
-              // set the current Wh value as offset for the next day and convert Wh to kWh
-              id(gOFFSET_${property_wh}) = id(${property_wh}).raw_state * 0.001;
-          - sensor.template.publish:
-              id: ${sensor_name}
-              state: 0.0
+# Time-based energy calculations are handled by the main sntp_time platform in common.yaml
