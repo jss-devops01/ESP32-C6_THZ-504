@@ -50,10 +50,10 @@ globals:
   - id: gROOM_HUMIDITY
     type: float
     initial_value: "0.0"
-  - id: gCOP_WW_TAG
+  - id: gCOP_DHW_DAY
     type: float
     initial_value: "1.0"
-  - id: gCOP_HEIZ_TAG
+  - id: gCOP_HEATING_DAY
     type: float
     initial_value: "1.0"
 
@@ -84,14 +84,14 @@ time:
         then:
           - lambda: |-
               // Queue energy-related property requests for all sensors
-              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_WW_TAG_WH);
-              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_WW_TAG_KWH);
-              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_HEIZ_TAG_WH);
-              queueRequest(Kessel, Property::kEL_ENERGIEAUFNAHME_HEIZ_TAG_KWH);
-              queueRequest(Kessel, Property::kWAERMEERTRAG_WW_TAG_WH);
-              queueRequest(Kessel, Property::kWAERMEERTRAG_WW_TAG_KWH);
-              queueRequest(Kessel, Property::kWAERMEERTRAG_HEIZ_TAG_WH);
-              queueRequest(Kessel, Property::kWAERMEERTRAG_HEIZ_TAG_KWH);
+              queueRequest(Kessel, Property::kELECTRIC_ENERGY_DHW_DAY_WH);
+              queueRequest(Kessel, Property::kELECTRIC_ENERGY_DHW_DAY_KWH);
+              queueRequest(Kessel, Property::kELECTRIC_ENERGY_HEATING_DAY_WH);
+              queueRequest(Kessel, Property::kELECTRIC_ENERGY_HEATING_DAY_KWH);
+              queueRequest(Kessel, Property::kHEAT_OUTPUT_DHW_DAY_WH);
+              queueRequest(Kessel, Property::kHEAT_OUTPUT_DHW_DAY_KWH);
+              queueRequest(Kessel, Property::kHEAT_OUTPUT_HEATING_DAY_WH);
+              queueRequest(Kessel, Property::kHEAT_OUTPUT_HEATING_DAY_KWH);
       # At midnight reset daily energy consumptions and save offsets
       - seconds: 0
         minutes: 0
@@ -99,21 +99,21 @@ time:
         then:
           - lambda: |-
               // Reset daily energy offsets for the next day
-              id(gOFFSET_EL_ENERGIEAUFNAHME_WW_TAG_WH) = id(EL_ENERGIEAUFNAHME_WW_TAG_WH).raw_state * 0.001;
-              id(gOFFSET_EL_ENERGIEAUFNAHME_HEIZ_TAG_WH) = id(EL_ENERGIEAUFNAHME_HEIZ_TAG_WH).raw_state * 0.001;
-              id(gOFFSET_WAERMEERTRAG_WW_TAG_WH) = id(WAERMEERTRAG_WW_TAG_WH).raw_state * 0.001;
-              id(gOFFSET_WAERMEERTRAG_HEIZ_TAG_WH) = id(WAERMEERTRAG_HEIZ_TAG_WH).raw_state * 0.001;
+              id(gOFFSET_ELECTRIC_ENERGY_DHW_DAY_WH) = id(ELECTRIC_ENERGY_DHW_DAY_WH).raw_state * 0.001;
+              id(gOFFSET_ELECTRIC_ENERGY_HEATING_DAY_WH) = id(ELECTRIC_ENERGY_HEATING_DAY_WH).raw_state * 0.001;
+              id(gOFFSET_HEAT_OUTPUT_DHW_DAY_WH) = id(HEAT_OUTPUT_DHW_DAY_WH).raw_state * 0.001;
+              id(gOFFSET_HEAT_OUTPUT_HEATING_DAY_WH) = id(HEAT_OUTPUT_HEATING_DAY_WH).raw_state * 0.001;
           - sensor.template.publish:
-              id: EL_ENERGIEAUFNAHME_WW_SUMME_KWH
+              id: ELECTRIC_ENERGY_DHW_TOTAL_KWH
               state: 0.0
           - sensor.template.publish:
               id: ELECTRIC_ENERGY_HEATING_TOTAL_KWH
               state: 0.0
           - sensor.template.publish:
-              id: WAERMEERTRAG_WW_TAG_SUMME_KWH
+              id: HEAT_OUTPUT_DHW_DAY_TOTAL_KWH
               state: 0.0
           - sensor.template.publish:
-              id: WAERMEERTRAG_HEIZ_TAG_SUMME_KWH
+              id: HEAT_OUTPUT_HEATING_DAY_TOTAL_KWH
               state: 0.0
 
 #########################################
@@ -241,27 +241,27 @@ sensor:
 #                                       #
 #########################################
   - platform: template
-    name: "COP WW TAG"
+    name: "COP DHW Day"
     update_interval: $interval_very_slow
     state_class: "measurement"
     filters:
       - median
     lambda: |-
-      if (id(WAERMEERTRAG_WW_TAG_SUMME_KWH).state && id(EL_ENERGIEAUFNAHME_WW_SUMME_KWH).state && id(EL_ENERGIEAUFNAHME_WW_SUMME_KWH).state != 0.0f) {
-        id(gCOP_WW_TAG) = id(WAERMEERTRAG_WW_TAG_SUMME_KWH).state / id(EL_ENERGIEAUFNAHME_WW_SUMME_KWH).state;
+      if (id(HEAT_OUTPUT_DHW_DAY_TOTAL_KWH).state && id(ELECTRIC_ENERGY_DHW_TOTAL_KWH).state && id(ELECTRIC_ENERGY_DHW_TOTAL_KWH).state != 0.0f) {
+        id(gCOP_DHW_DAY) = id(HEAT_OUTPUT_DHW_DAY_TOTAL_KWH).state / id(ELECTRIC_ENERGY_DHW_TOTAL_KWH).state;
       }
-      return id(gCOP_WW_TAG);
+      return id(gCOP_DHW_DAY);
   - platform: template
-    name: "COP HEIZ TAG"
+    name: "COP Heating Day"
     update_interval: $interval_very_slow
     state_class: "measurement"
     filters:
       - median
     lambda: |-
-      if (id(WAERMEERTRAG_HEIZ_TAG_SUMME_KWH).state && id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state && id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state != 0.0f) {
-        id(gCOP_HEIZ_TAG) = id(WAERMEERTRAG_HEIZ_TAG_SUMME_KWH).state / id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state;
+      if (id(HEAT_OUTPUT_HEATING_DAY_TOTAL_KWH).state && id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state && id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state != 0.0f) {
+        id(gCOP_HEATING_DAY) = id(HEAT_OUTPUT_HEATING_DAY_TOTAL_KWH).state / id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state;
       }
-      return id(gCOP_HEIZ_TAG);
+      return id(gCOP_HEATING_DAY);
 
 #########################################
 #                                       #
