@@ -17,7 +17,7 @@ esphome:
           CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kSUPPLY_AIR_ACTUAL),[](const SimpleVariant& value){
             // workaround for broken ninth bit of BETRIEBSSTATUS
             const auto zuluftIst = static_cast<std::uint16_t>(value);
-            id(LUEFTUNG).publish_state(zuluftIst > 0U);
+            id(VENTILATION).publish_state(zuluftIst > 0U);
           });
           scheduleRequest(Kessel, Property::kSUPPLY_AIR_ACTUAL, std::chrono::seconds(10));
 
@@ -72,7 +72,7 @@ esphome:
             id(SERVICE).publish_state(status_bits.test(6U));
             id(EVU_SPERRE).publish_state(status_bits.test(7U));
             id(FILTERWECHSEL_BEIDE).publish_state(status_bits.test(8U));
-            // seems to be broken id(LUEFTUNG).publish_state(status_bits.test(9U));
+            // seems to be broken id(VENTILATION).publish_state(status_bits.test(9U));
             id(HEIZKREISPUMPE).publish_state(status_bits.test(10U));
             id(ABTAUEN_VERDAMPFER).publish_state(status_bits.test(11U));
             id(FILTERWECHSEL_ABLUFT).publish_state(status_bits.test(12U));
@@ -161,7 +161,7 @@ external_components:
 climate:
   - platform: custom
     lambda: |-
-      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_DAY), id(HEIZEN), id(KUEHLEN), id(LUEFTUNG), Property::kROOM_TEMP_SETPOINT_DAY, Property::kCOOLING_ROOM_SETPOINT_DAY);
+      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_DAY), id(HEIZEN), id(KUEHLEN), id(VENTILATION), Property::kROOM_TEMP_SETPOINT_DAY, Property::kCOOLING_ROOM_SETPOINT_DAY);
       App.register_component(heating);
       return {heating};
     climates:
@@ -175,7 +175,7 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_NIGHT), id(HEIZEN), id(KUEHLEN), id(LUEFTUNG), Property::kROOM_TEMP_SETPOINT_NIGHT, Property::kKUEHL_RAUMSOLL_NACHT);
+      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_NIGHT), id(HEIZEN), id(KUEHLEN), id(VENTILATION), Property::kROOM_TEMP_SETPOINT_NIGHT, Property::kKUEHL_RAUMSOLL_NACHT);
       App.register_component(heating);
       return {heating};
     climates:
@@ -239,7 +239,7 @@ packages:
   SERVICE:                             !include { file: wp_binary.yaml, vars: { name: "SERVICE" }}
   HEIZEN:                              !include { file: wp_binary.yaml, vars: { name: "HEIZEN" }}
   KUEHLEN:                             !include { file: wp_binary.yaml, vars: { name: "KUEHLEN" }}
-  LUEFTUNG:                            !include { file: wp_binary.yaml, vars: { name: "LUEFTUNG" }}
+  VENTILATION:                         !include { file: wp_binary.yaml, vars: { name: "VENTILATION" }}
   EVU_SPERRE:                          !include { file: wp_binary.yaml, vars: { name: "EVU_SPERRE" }}
   FILTERWECHSEL_BEIDE:                 !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_BEIDE" }}
   HEIZKREISPUMPE:                      !include { file: wp_binary.yaml, vars: { name: "HEIZKREISPUMPE" }}
@@ -260,9 +260,9 @@ packages:
   COOLING_ROOM_SETPOINT_DAY:           !include { file: wp_temperature.yaml, vars: { property: "COOLING_ROOM_SETPOINT_DAY"     , target: "HK1" , writable: "true" }}
   EVAPORATOR_TEMP:                     !include { file: wp_temperature.yaml, vars: { property: "EVAPORATOR_TEMP"  }}
 
-  LUEFT_STUFE_TAG:                     !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_TAG"   }}
-  LUEFT_STUFE_NACHT:                   !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_NACHT" }}
-  LUEFT_STUFE_PARTY:                   !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_PARTY" }}
+  VENT_LEVEL_DAY:                      !include { file: wp_ventilation.yaml, vars: { property: "VENT_LEVEL_DAY"     }}
+  VENT_LEVEL_NIGHT:                    !include { file: wp_ventilation.yaml, vars: { property: "VENT_LEVEL_NIGHT"   }}
+  VENT_LEVEL_PARTY:                    !include { file: wp_ventilation.yaml, vars: { property: "VENT_LEVEL_PARTY"   }}
 
   EXHAUST_AIR_HUMIDITY:                !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_HUMIDITY"            , update_interval: $interval_very_slow       , unit: "%"    , icon: "mdi:water-percent"}}
   MOTORSTROM:                          !include { file: wp_generic.yaml, vars: { property: "MOTORSTROM"               , update_interval: $interval_medium          , unit: "A"    , icon: "mdi:current-ac"}}
@@ -277,7 +277,7 @@ packages:
   EXHAUST_AIR_SETPOINT:                !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_SETPOINT"     , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   OUTDOOR_AIR_SETPOINT:                !include { file: wp_generic.yaml, vars: { property: "OUTDOOR_AIR_SETPOINT"     , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   SUPPLY_AIR_SETPOINT:                 !include { file: wp_generic.yaml, vars: { property: "SUPPLY_AIR_SETPOINT"      , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
-  VOLUMENSTROM:                        !include { file: wp_generic.yaml, vars: { property: "VOLUMENSTROM"             , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
+  VOLUME_FLOW:                         !include { file: wp_generic.yaml, vars: { property: "VOLUME_FLOW"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   LAUFZEIT_FILTER:                     !include { file: wp_generic.yaml, vars: { property: "LAUFZEIT_FILTER"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
   ANZEIGE_NIEDERDRUCK:                 !include { file: wp_generic.yaml, vars: { property: "ANZEIGE_NIEDERDRUCK"      , accuracy_decimals: "2" }}
   PUMPENZYKLEN_MIN_AUSSENT:            !include { file: wp_generic.yaml, vars: { property: "PUMPENZYKLEN_MIN_AUSSENT" , icon: "mdi:numeric"  }}
@@ -291,12 +291,12 @@ packages:
   LEISTUNG_AUSLEGUNG_KUEHLEN:          !include { file: wp_number.yaml, vars: { property: "LEISTUNG_AUSLEGUNG_KUEHLEN" , min: "30", max: "50" }}
   PUMPENDREHZAHL_HEIZEN:               !include { file: wp_number.yaml, vars: { property: "PUMPENDREHZAHL_HEIZEN"      , step: "0.1" }}
   HYSTERESE_WW:                        !include { file: wp_number.yaml, vars: { property: "HYSTERESE_WW"               , min: "2.0", max: "10.0", step: "0.1", unit: "°C" }}
-  LUEFT_ZULUFT_STUFE1:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ZULUFT_STUFE1", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
-  LUEFT_ZULUFT_STUFE2:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ZULUFT_STUFE2", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
+  VENT_SUPPLY_LEVEL1:                  !include { file: wp_number.yaml, vars: { property: "VENT_SUPPLY_LEVEL1", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
+  VENT_SUPPLY_LEVEL2:                  !include { file: wp_number.yaml, vars: { property: "VENT_SUPPLY_LEVEL2", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
   LUEFT_ZULUFT_STUFE3:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ZULUFT_STUFE3", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
-  LUEFT_ABLUFT_STUFE1:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ABLUFT_STUFE1", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
-  LUEFT_ABLUFT_STUFE2:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ABLUFT_STUFE2", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
-  LUEFT_ABLUFT_STUFE3:                 !include { file: wp_number.yaml, vars: { property: "LUEFT_ABLUFT_STUFE3", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
+  VENT_EXHAUST_LEVEL1:                 !include { file: wp_number.yaml, vars: { property: "VENT_EXHAUST_LEVEL1", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
+  VENT_EXHAUST_LEVEL2:                 !include { file: wp_number.yaml, vars: { property: "VENT_EXHAUST_LEVEL2", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
+  VENT_EXHAUST_LEVEL3:                 !include { file: wp_number.yaml, vars: { property: "VENT_EXHAUST_LEVEL3", min: "0.0", max: "300.0", unit: "m³/h", icon: "mdi:air-filter"  }}
 
   WAERMEERTRAG_RUECKGE_TAG_SUMME_KWH:  !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_RUECKGE_TAG_SUMME_KWH" , property_wh: "WAERMEERTRAG_RUECKGE_TAG_WH"  , property_kwh: "WAERMEERTRAG_RUECKGE_TAG_KWH"  }}
   WAERMEERTRAG_2WE_WW_TAG_SUMME_KWH:   !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "WAERMEERTRAG_2WE_WW_TAG_SUMME_KWH"  , property_wh: "WAERMEERTRAG_2WE_WW_TAG_WH"   , property_kwh: "WAERMEERTRAG_2WE_WW_TAG_KWH"   }}
