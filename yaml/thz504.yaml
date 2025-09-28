@@ -8,5 +8,5 @@ packages:
   BASE:   !include { file: wp_base.yaml }
 
   EXHAUST_AIR_DEWPOINT: !include { file: wp_temperature.yaml, vars: { property: "EXHAUST_AIR_DEWPOINT" }}
-  DIFFERENZDRUCK:       !include { file: wp_generic.yaml, vars: { property: "DIFFERENZDRUCK"      , icon: "mdi:air-filter", unit: "Pa", update_interval: $interval_medium          }}
-  LAUFZEIT_FILTER_TAGE: !include { file: wp_generic.yaml, vars: { property: "LAUFZEIT_FILTER_TAGE", icon: "mdi:air-filter", unit: "d" , update_interval: $interval_once_in_a_while }}
+  DIFFERENTIAL_PRESSURE:       !include { file: wp_generic.yaml, vars: { property: "DIFFERENTIAL_PRESSURE"      , icon: "mdi:air-filter", unit: "Pa", update_interval: $interval_medium          }}
+  FILTER_RUNTIME_DAYS: !include { file: wp_generic.yaml, vars: { property: "FILTER_RUNTIME_DAYS", icon: "mdi:air-filter", unit: "d" , update_interval: $interval_once_in_a_while }}

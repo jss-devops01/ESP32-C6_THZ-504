@@ -41,7 +41,7 @@ esphome:
           });
 
           id(ELECTRIC_BACKUP_HEATING).add_on_state_callback([](const bool state){
-            const auto electricHeatingPower = state ? id(NE_STUFE_WW).state * 230.0 /*V*/ * 12.6 /*A*/ : 0.0f;
+            const auto electricHeatingPower = state ? id(BACKUP_HEATER_LEVEL_DHW).state * 230.0 /*V*/ * 12.6 /*A*/ : 0.0f;
             id(ELECTRIC_HEATING_POWER).publish_state(electricHeatingPower);
           });
 
@@ -70,13 +70,13 @@ esphome:
             id(DHW_HEATING).publish_state(status_bits.test(4U));
             id(ELECTRIC_BACKUP_HEATING).publish_state(status_bits.test(5U));
             id(SERVICE).publish_state(status_bits.test(6U));
-            id(EVU_SPERRE).publish_state(status_bits.test(7U));
-            id(FILTERWECHSEL_BEIDE).publish_state(status_bits.test(8U));
+            id(UTILITY_LOCKOUT).publish_state(status_bits.test(7U));
+            id(FILTER_CHANGE_BOTH).publish_state(status_bits.test(8U));
             // seems to be broken id(VENTILATION).publish_state(status_bits.test(9U));
             id(HEATING_CIRCUIT_PUMP).publish_state(status_bits.test(10U));
             id(DEFROST_EVAPORATOR).publish_state(status_bits.test(11U));
-            id(FILTERWECHSEL_ABLUFT).publish_state(status_bits.test(12U));
-            id(FILTERWECHSEL_ZULUFT).publish_state(status_bits.test(13U));
+            id(FILTER_CHANGE_EXHAUST).publish_state(status_bits.test(12U));
+            id(FILTER_CHANGE_SUPPLY).publish_state(status_bits.test(13U));
             id(HEATUP_PROGRAM_ACTIVE).publish_state(status_bits.test(14U));
           });
           scheduleRequest(Kessel, Property::kBETRIEBS_STATUS, std::chrono::seconds(10));
@@ -240,12 +240,12 @@ packages:
   HEATING:                             !include { file: wp_binary.yaml, vars: { name: "HEATING" }}
   COOLING:                             !include { file: wp_binary.yaml, vars: { name: "COOLING" }}
   VENTILATION:                         !include { file: wp_binary.yaml, vars: { name: "VENTILATION" }}
-  EVU_SPERRE:                          !include { file: wp_binary.yaml, vars: { name: "EVU_SPERRE" }}
-  FILTERWECHSEL_BEIDE:                 !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_BEIDE" }}
+  UTILITY_LOCKOUT:                     !include { file: wp_binary.yaml, vars: { name: "UTILITY_LOCKOUT" }}
+  FILTER_CHANGE_BOTH:                  !include { file: wp_binary.yaml, vars: { name: "FILTER_CHANGE_BOTH" }}
   HEATING_CIRCUIT_PUMP:                !include { file: wp_binary.yaml, vars: { name: "HEATING_CIRCUIT_PUMP" }}
   DEFROST_EVAPORATOR:                  !include { file: wp_binary.yaml, vars: { name: "DEFROST_EVAPORATOR" }}
-  FILTERWECHSEL_ABLUFT:                !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_ABLUFT" }}
-  FILTERWECHSEL_ZULUFT:                !include { file: wp_binary.yaml, vars: { name: "FILTERWECHSEL_ZULUFT" }}
+  FILTER_CHANGE_EXHAUST:               !include { file: wp_binary.yaml, vars: { name: "FILTER_CHANGE_EXHAUST" }}
+  FILTER_CHANGE_SUPPLY:                !include { file: wp_binary.yaml, vars: { name: "FILTER_CHANGE_SUPPLY" }}
   HEATUP_PROGRAM_ACTIVE:               !include { file: wp_binary.yaml, vars: { name: "HEATUP_PROGRAM_ACTIVE" }}
   SUMMER_MODE_ACTIVE:                  !include { file: wp_binary.yaml, vars: { name: "SUMMER_MODE_ACTIVE" }}
   STOVE_FIREPLACE_ACTIVE:              !include { file: wp_binary.yaml, vars: { name: "STOVE_FIREPLACE_ACTIVE" }}
@@ -278,15 +278,15 @@ packages:
   OUTDOOR_AIR_SETPOINT:                !include { file: wp_generic.yaml, vars: { property: "OUTDOOR_AIR_SETPOINT"     , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   SUPPLY_AIR_SETPOINT:                 !include { file: wp_generic.yaml, vars: { property: "SUPPLY_AIR_SETPOINT"      , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   VOLUME_FLOW:                         !include { file: wp_generic.yaml, vars: { property: "VOLUME_FLOW"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
-  LAUFZEIT_FILTER:                     !include { file: wp_generic.yaml, vars: { property: "LAUFZEIT_FILTER"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
-  ANZEIGE_NIEDERDRUCK:                 !include { file: wp_generic.yaml, vars: { property: "ANZEIGE_NIEDERDRUCK"      , accuracy_decimals: "2" }}
+  FILTER_RUNTIME:                      !include { file: wp_generic.yaml, vars: { property: "FILTER_RUNTIME"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
+  LOW_PRESSURE_DISPLAY:                !include { file: wp_generic.yaml, vars: { property: "LOW_PRESSURE_DISPLAY"      , accuracy_decimals: "2" }}
   PUMP_CYCLES_MIN_OUTSIDE_TEMP:        !include { file: wp_generic.yaml, vars: { property: "PUMP_CYCLES_MIN_OUTSIDE_TEMP" , icon: "mdi:numeric"  }}
   SETPOINT_MAX_HC1:                    !include { file: wp_generic.yaml, vars: { property: "SETPOINT_MAX_HC1"          , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
   SETPOINT_MIN_HC1:                    !include { file: wp_generic.yaml, vars: { property: "SETPOINT_MIN_HC1"          , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
   FLOW_SHARE_HC1:                      !include { file: wp_generic.yaml, vars: { property: "FLOW_SHARE_HC1"            , unit: "%" , icon: "mdi:percent-box"         , target: "HK1" }}
   BASE_POINT_HC1:                      !include { file: wp_generic.yaml, vars: { property: "BASE_POINT_HC1"             , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
 
-  NE_STUFE_WW:                         !include { file: wp_number.yaml, vars: { property: "NE_STUFE_WW"                , min: "0" , max: "3"  }}
+  BACKUP_HEATER_LEVEL_DHW:             !include { file: wp_number.yaml, vars: { property: "BACKUP_HEATER_LEVEL_DHW"                , min: "0" , max: "3"  }}
   DESIGN_POWER_HEATING:                !include { file: wp_number.yaml, vars: { property: "DESIGN_POWER_HEATING"       , min: "40", max: "100"}}
   DESIGN_POWER_COOLING:                !include { file: wp_number.yaml, vars: { property: "DESIGN_POWER_COOLING" , min: "30", max: "50" }}
   PUMP_SPEED_HEATING:                  !include { file: wp_number.yaml, vars: { property: "PUMP_SPEED_HEATING"         , step: "0.1" }}
@@ -323,7 +323,7 @@ packages:
   ADJUSTED_ROOM_TEMP_SETPOINT:         !include { file: wp_temperature.yaml, vars: { property: "ADJUSTED_ROOM_TEMP_SETPOINT"  , target: "HK1" }}
   FLOW_TEMP_SETPOINT:                  !include { file: wp_temperature.yaml, vars: { property: "FLOW_TEMP_SETPOINT"          , target: "HK1" }}
 
-  FEHLERMELDUNG:                       !include { file: wp_generic.yaml, vars: { property: "FEHLERMELDUNG"      , icon: "mdi:alert-circle" }}
+  ERROR_MESSAGE:                       !include { file: wp_generic.yaml, vars: { property: "ERROR_MESSAGE"      , icon: "mdi:alert-circle" }}
   ROOM_HUMIDITY:                       !include { file: wp_generic.yaml, vars: { property: "ROOM_HUMIDITY"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
   SLOPE_HC1:                           !include { file: wp_generic.yaml, vars: { property: "SLOPE_HC1"            , icon: "mdi:valve", target: "HK1", accuracy_decimals: "2" }}
 

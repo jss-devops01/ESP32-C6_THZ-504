@@ -58,7 +58,7 @@ struct Property : public oe32trta::detail::Property {
     Property(const std::uint16_t _id) : oe32trta::detail::Property{getProperty(_id)} {}
 
     PROPERTY(INDEX_NOT_FOUND, 0x0000);
-    PROPERTY(FEHLERMELDUNG, 0x0001);
+    PROPERTY(ERROR_MESSAGE, 0x0001);
     PROPERTY(STORAGE_TEMP_SETPOINT, 0x0003, Type::et_dec_val);
     PROPERTY(FLOW_TEMP_SETPOINT, 0x0004, Type::et_dec_val);
     PROPERTY(OUTSIDE_TEMP, 0x000c, Type::et_dec_val);
@@ -111,7 +111,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(DEWPOINT_HC1, 0x0264, Type::et_dec_val);
     PROPERTY(COOLING_MODE, 0x0287, Type::et_bool);
     PROPERTY(PUMP_SPEED_HEATING, 0x02cb, Type::et_dec_val);
-    PROPERTY(LAUFZEIT_FILTER_TAGE, 0x0341);
+    PROPERTY(FILTER_RUNTIME_DAYS, 0x0341);
     PROPERTY(HEAT_RECOVERY_DAY_WH, 0x03ae);
     PROPERTY(HEAT_RECOVERY_DAY_KWH, 0x03af);
     PROPERTY(HEAT_RECOVERY_TOTAL_KWH, 0x03b0);
@@ -133,7 +133,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(VENT_EXHAUST_LEVEL1, 0x0579);
     PROPERTY(VENT_EXHAUST_LEVEL2, 0x057a);
     PROPERTY(VENT_EXHAUST_LEVEL3, 0x057b);
-    PROPERTY(NE_STUFE_WW, 0x058a);
+    PROPERTY(BACKUP_HEATER_LEVEL_DHW, 0x058a);
     PROPERTY(DHW_ECO, 0x058d, Type::et_bool);
     PROPERTY(SUPPLY_AIR_SETPOINT, 0x0596);
     PROPERTY(SUPPLY_AIR_ACTUAL, 0x0597);
@@ -154,7 +154,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(MOTOR_POWER, 0x06a0, Type::et_cent_val);
     PROPERTY(MOTOR_VOLTAGE, 0x06a1);
     PROPERTY(EXHAUST_AIR_TEMP, 0x0694, Type::et_dec_val);
-    PROPERTY(ANZEIGE_NIEDERDRUCK, 0x07a7, Type::et_dec_val);
+    PROPERTY(LOW_PRESSURE_DISPLAY, 0x07a7, Type::et_dec_val);
     PROPERTY(HEAT_OUTPUT_2WE_DHW_DAY_WH, 0x0922);
     PROPERTY(HEAT_OUTPUT_2WE_DHW_DAY_KWH, 0x0923, Type::et_double_val);
     PROPERTY(HEAT_OUTPUT_2WE_DHW_TOTAL_KWH, 0x0924);
@@ -169,8 +169,8 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(COMPRESSOR_STARTS, 0xc0f4);
     PROPERTY(VERDICHTER_STARTS_K, 0xc0f5);
     PROPERTY(EXHAUST_AIR_DEWPOINT, 0xc0f6, Type::et_dec_val);
-    PROPERTY(LAUFZEIT_FILTER, 0xc111);
-    PROPERTY(DIFFERENZDRUCK, 0xc11e);
+    PROPERTY(FILTER_RUNTIME, 0xc111);
+    PROPERTY(DIFFERENTIAL_PRESSURE, 0xc11e);
     PROPERTY(BETRIEBS_STATUS_2, 0xc356);
     PROPERTY(ZEITSPERRE_NE, 0x0588);
 #endif
