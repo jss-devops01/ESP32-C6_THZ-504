@@ -107,7 +107,7 @@ time:
               id: EL_ENERGIEAUFNAHME_WW_SUMME_KWH
               state: 0.0
           - sensor.template.publish:
-              id: EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH
+              id: ELECTRIC_ENERGY_HEATING_TOTAL_KWH
               state: 0.0
           - sensor.template.publish:
               id: WAERMEERTRAG_WW_TAG_SUMME_KWH
@@ -258,8 +258,8 @@ sensor:
     filters:
       - median
     lambda: |-
-      if (id(WAERMEERTRAG_HEIZ_TAG_SUMME_KWH).state && id(EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH).state && id(EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH).state != 0.0f) {
-        id(gCOP_HEIZ_TAG) = id(WAERMEERTRAG_HEIZ_TAG_SUMME_KWH).state / id(EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH).state;
+      if (id(WAERMEERTRAG_HEIZ_TAG_SUMME_KWH).state && id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state && id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state != 0.0f) {
+        id(gCOP_HEIZ_TAG) = id(WAERMEERTRAG_HEIZ_TAG_SUMME_KWH).state / id(ELECTRIC_ENERGY_HEATING_TOTAL_KWH).state;
       }
       return id(gCOP_HEIZ_TAG);
 
