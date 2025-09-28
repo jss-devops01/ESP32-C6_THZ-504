@@ -47,7 +47,7 @@ globals:
   - id: gROOM_TEMP_ACTUAL
     type: float
     initial_value: "0.0"
-  - id: gRAUMFEUCHTE
+  - id: gROOM_HUMIDITY
     type: float
     initial_value: "0.0"
   - id: gCOP_WW_TAG
@@ -158,11 +158,11 @@ interval:
             ESP_LOGI("SET", "Sending cached room temperature %f to heatpump", room_temp);
             sendData(HK1, Property::kROOM_TEMP_ACTUAL, static_cast<std::uint16_t>(room_temp * 10.0f));
           }
-          // Send current RAUMFEUCHTE
-          const auto humidity = id(gRAUMFEUCHTE);
+          // Send current ROOM_HUMIDITY
+          const auto humidity = id(gROOM_HUMIDITY);
           if(humidity > 0.0) {
             ESP_LOGI("SET", "Sending cached humidity %f to heatpump", humidity);
-            sendData(HK1, Property::kRAUMFEUCHTE, static_cast<std::uint16_t>(humidity * 10.0f));
+            sendData(HK1, Property::kROOM_HUMIDITY, static_cast<std::uint16_t>(humidity * 10.0f));
           }
 
 #########################################
@@ -233,7 +233,7 @@ sensor:
       then:
         - lambda: |-
             ESP_LOGI("SET", "Updating humidity to %f", x);
-            id(gRAUMFEUCHTE) = x;
+            id(gROOM_HUMIDITY) = x;
 
 #########################################
 #                                       #

@@ -1,28 +1,28 @@
 ﻿
-[2025-09-28 22:33:51] Starting ESPHome direct upload process...
-[2025-09-28 22:33:51] Project path: C:\dev\repos\OneESP32ToRuleThemAll
-[2025-09-28 22:33:51] Config file:  esp32-c6-thz504.yaml
-[2025-09-28 22:33:51] Device IP:    192.168.200.80
-[2025-09-28 22:33:52] ESPHome found: Version: 2025.5.1
-[2025-09-28 22:33:52] Starting compilation of esp32-c6-thz504.yaml...
-[2025-09-28 22:33:52] Running: esphome compile esp32-c6-thz504.yaml
-[2025-09-28 22:34:22] Compilation completed successfully!
-[2025-09-28 22:34:22] Testing connection to device at 192.168.200.80...
-[2025-09-28 22:34:23] Device is reachable at 192.168.200.80
-[2025-09-28 22:34:23] Starting upload to device at 192.168.200.80...
-[2025-09-28 22:34:23] Running: esphome upload esp32-c6-thz504.yaml --device 192.168.200.80
-[2025-09-28 22:34:37] Upload completed successfully!
-[2025-09-28 22:34:37] Device should be rebooting now...
-[2025-09-28 22:34:37] === OPERATION SUMMARY ===
-[2025-09-28 22:34:37] Config File: esp32-c6-thz504.yaml
-[2025-09-28 22:34:37] Device IP:   192.168.200.80
-[2025-09-28 22:34:37] Project:     C:\dev\repos\OneESP32ToRuleThemAll
-[2025-09-28 22:34:37] 
-[2025-09-28 22:34:37] Compilation: SUCCESS
-[2025-09-28 22:34:37] Upload:      SUCCESS
-[2025-09-28 22:34:37] 
-[2025-09-28 22:34:37] Log file: C:\dev\repos\OneESP32ToRuleThemAll\upload-log.txt
-[2025-09-28 22:34:37] Next steps:
-[2025-09-28 22:34:37] - Device should be running new firmware
-[2025-09-28 22:34:37] - Check Home Assistant for updated sensors
-[2025-09-28 22:34:37] - Monitor device logs with: .\upload-to-esp32.ps1 -Logs
+[2025-09-28 22:44:53] Starting ESPHome direct upload process...
+[2025-09-28 22:44:53] Project path: C:\dev\repos\OneESP32ToRuleThemAll
+[2025-09-28 22:44:53] Config file:  esp32-c6-thz504.yaml
+[2025-09-28 22:44:53] Device IP:    192.168.200.80
+[2025-09-28 22:44:53] ESPHome found: Version: 2025.5.1
+[2025-09-28 22:44:53] Starting compilation of esp32-c6-thz504.yaml...
+[2025-09-28 22:44:53] Running: esphome compile esp32-c6-thz504.yaml
+[2025-09-28 22:45:04] Compilation completed successfully!
+[2025-09-28 22:45:04] Testing connection to device at 192.168.200.80...
+[2025-09-28 22:45:05] Device is reachable at 192.168.200.80
+[2025-09-28 22:45:05] Starting upload to device at 192.168.200.80...
+[2025-09-28 22:45:05] Running: esphome upload esp32-c6-thz504.yaml --device 192.168.200.80
+[2025-09-28 22:45:18] Upload completed successfully!
+[2025-09-28 22:45:18] Device should be rebooting now...
+[2025-09-28 22:45:18] === OPERATION SUMMARY ===
+[2025-09-28 22:45:18] Config File: esp32-c6-thz504.yaml
+[2025-09-28 22:45:18] Device IP:   192.168.200.80
+[2025-09-28 22:45:18] Project:     C:\dev\repos\OneESP32ToRuleThemAll
+[2025-09-28 22:45:18] 
+[2025-09-28 22:45:18] Compilation: SUCCESS
+[2025-09-28 22:45:18] Upload:      SUCCESS
+[2025-09-28 22:45:18] 
+[2025-09-28 22:45:18] Log file: C:\dev\repos\OneESP32ToRuleThemAll\upload-log.txt
+[2025-09-28 22:45:18] Next steps:
+[2025-09-28 22:45:18] - Device should be running new firmware
+[2025-09-28 22:45:18] - Check Home Assistant for updated sensors
+[2025-09-28 22:45:18] - Monitor device logs with: .\upload-to-esp32.ps1 -Logs

@@ -14,18 +14,18 @@ esphome:
           });
           scheduleRequest(Kessel, Property::kPASSIVKUEHLUNG, std::chrono::seconds(10));
 
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kZULUFT_IST),[](const SimpleVariant& value){
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kSUPPLY_AIR_ACTUAL),[](const SimpleVariant& value){
             // workaround for broken ninth bit of BETRIEBSSTATUS
             const auto zuluftIst = static_cast<std::uint16_t>(value);
             id(LUEFTUNG).publish_state(zuluftIst > 0U);
           });
-          scheduleRequest(Kessel, Property::kZULUFT_IST, std::chrono::seconds(10));
+          scheduleRequest(Kessel, Property::kSUPPLY_AIR_ACTUAL, std::chrono::seconds(10));
 
-          CallbackHandler::instance().addCallbacks({std::make_pair(Kessel,Property::kABLUFT_SOLL),
-                                                    std::make_pair(Kessel,Property::kZULUFT_SOLL)},
+          CallbackHandler::instance().addCallbacks({std::make_pair(Kessel,Property::kEXHAUST_AIR_SETPOINT),
+                                                    std::make_pair(Kessel,Property::kSUPPLY_AIR_SETPOINT)},
                                                     [](const SimpleVariant&) {
-            const auto airflowIn{id(ZULUFT_SOLL).state};
-            const auto airflowOut{id(ABLUFT_SOLL).state};
+            const auto airflowIn{id(SUPPLY_AIR_SETPOINT).state};
+            const auto airflowOut{id(EXHAUST_AIR_SETPOINT).state};
             auto getPower = [](const float airflow){
               if(airflow < 0.1f) {
                 return 0.0f;
@@ -254,7 +254,7 @@ packages:
   STORAGE_TEMP_SETPOINT_DAY:           !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_SETPOINT_DAY"   , writable: "true" }}
   STORAGE_TEMP_SETPOINT_NIGHT:         !include { file: wp_temperature.yaml, vars: { property: "STORAGE_TEMP_SETPOINT_NIGHT" , writable: "true" }}
   COLLECTOR_TEMP_ACTUAL:               !include { file: wp_temperature.yaml, vars: { property: "COLLECTOR_TEMP_ACTUAL"         , update_interval: $interval_medium }}
-  TAUPUNKT_HK1:                        !include { file: wp_temperature.yaml, vars: { property: "TAUPUNKT_HK1"           , target: "HK1" }}
+  DEWPOINT_HC1:                        !include { file: wp_temperature.yaml, vars: { property: "DEWPOINT_HC1"           , target: "HK1" }}
   ROOM_TEMP_SETPOINT_DAY:              !include { file: wp_temperature.yaml, vars: { property: "ROOM_TEMP_SETPOINT_DAY"       , target: "HK1" , writable: "true" }}
   ROOM_TEMP_SETPOINT_NIGHT:            !include { file: wp_temperature.yaml, vars: { property: "ROOM_TEMP_SETPOINT_NIGHT"     , target: "HK1" , writable: "true" }}
   COOLING_ROOM_SETPOINT_DAY:           !include { file: wp_temperature.yaml, vars: { property: "COOLING_ROOM_SETPOINT_DAY"     , target: "HK1" , writable: "true" }}
@@ -264,19 +264,19 @@ packages:
   LUEFT_STUFE_NACHT:                   !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_NACHT" }}
   LUEFT_STUFE_PARTY:                   !include { file: wp_ventilation.yaml, vars: { property: "LUEFT_STUFE_PARTY" }}
 
-  ABLUFTFEUCHTE:                       !include { file: wp_generic.yaml, vars: { property: "ABLUFTFEUCHTE"            , update_interval: $interval_very_slow       , unit: "%"    , icon: "mdi:water-percent"}}
+  EXHAUST_AIR_HUMIDITY:                !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_HUMIDITY"            , update_interval: $interval_very_slow       , unit: "%"    , icon: "mdi:water-percent"}}
   MOTORSTROM:                          !include { file: wp_generic.yaml, vars: { property: "MOTORSTROM"               , update_interval: $interval_medium          , unit: "A"    , icon: "mdi:current-ac"}}
   MOTORSPANNUNG:                       !include { file: wp_generic.yaml, vars: { property: "MOTORSPANNUNG"            , update_interval: $interval_medium          , unit: "V"    , icon: "mdi:sine-wave"}}
   MOTORLEISTUNG:                       !include { file: wp_generic.yaml, vars: { property: "MOTORLEISTUNG"            , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:flash", accuracy_decimals: "2" }}
   VERDICHTERDREHZAHL:                  !include { file: wp_generic.yaml, vars: { property: "VERDICHTERDREHZAHL"       , update_interval: $interval_medium          , unit: "Hz"   , icon: "mdi:gauge" }}
   HEIZLEISTUNG_RELATIV:                !include { file: wp_generic.yaml, vars: { property: "HEIZLEISTUNG_RELATIV"     , update_interval: $interval_medium          , unit: "%"    , icon: "mdi:gauge" }}
   HEIZ_KUEHL_LEISTUNG:                 !include { file: wp_generic.yaml, vars: { property: "HEIZ_KUEHL_LEISTUNG"      , update_interval: $interval_medium          , unit: "kW"   , icon: "mdi:home-lightning-bolt-outline", accuracy_decimals: "2" }}
-  ABLUFT_IST:                          !include { file: wp_generic.yaml, vars: { property: "ABLUFT_IST"               , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
-  FORTLUFT_IST:                        !include { file: wp_generic.yaml, vars: { property: "FORTLUFT_IST"             , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
-  ZULUFT_IST:                          !include { file: wp_generic.yaml, vars: { property: "ZULUFT_IST"               , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
-  ABLUFT_SOLL:                         !include { file: wp_generic.yaml, vars: { property: "ABLUFT_SOLL"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
-  FORTLUFT_SOLL:                       !include { file: wp_generic.yaml, vars: { property: "FORTLUFT_SOLL"            , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
-  ZULUFT_SOLL:                         !include { file: wp_generic.yaml, vars: { property: "ZULUFT_SOLL"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
+  EXHAUST_AIR_ACTUAL:                  !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_ACTUAL"               , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
+  OUTDOOR_AIR_ACTUAL:                  !include { file: wp_generic.yaml, vars: { property: "OUTDOOR_AIR_ACTUAL"       , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
+  SUPPLY_AIR_ACTUAL:                   !include { file: wp_generic.yaml, vars: { property: "SUPPLY_AIR_ACTUAL"        , update_interval: $interval_slow            , unit: "Hz"   , icon: "mdi:fan"   }}
+  EXHAUST_AIR_SETPOINT:                !include { file: wp_generic.yaml, vars: { property: "EXHAUST_AIR_SETPOINT"     , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
+  OUTDOOR_AIR_SETPOINT:                !include { file: wp_generic.yaml, vars: { property: "OUTDOOR_AIR_SETPOINT"     , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
+  SUPPLY_AIR_SETPOINT:                 !include { file: wp_generic.yaml, vars: { property: "SUPPLY_AIR_SETPOINT"      , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   VOLUMENSTROM:                        !include { file: wp_generic.yaml, vars: { property: "VOLUMENSTROM"             , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   LAUFZEIT_FILTER:                     !include { file: wp_generic.yaml, vars: { property: "LAUFZEIT_FILTER"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
   ANZEIGE_NIEDERDRUCK:                 !include { file: wp_generic.yaml, vars: { property: "ANZEIGE_NIEDERDRUCK"      , accuracy_decimals: "2" }}
@@ -324,7 +324,7 @@ packages:
   FLOW_TEMP_SETPOINT:                  !include { file: wp_temperature.yaml, vars: { property: "FLOW_TEMP_SETPOINT"          , target: "HK1" }}
 
   FEHLERMELDUNG:                       !include { file: wp_generic.yaml, vars: { property: "FEHLERMELDUNG"      , icon: "mdi:alert-circle" }}
-  RAUMFEUCHTE:                         !include { file: wp_generic.yaml, vars: { property: "RAUMFEUCHTE"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
+  ROOM_HUMIDITY:                       !include { file: wp_generic.yaml, vars: { property: "ROOM_HUMIDITY"        , interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
   STEIGUNG_HK1:                        !include { file: wp_generic.yaml, vars: { property: "STEIGUNG_HK1"       , icon: "mdi:valve", target: "HK1", accuracy_decimals: "2" }}
 
   RAUMEINFLUSS:                        !include { file: wp_number.yaml, vars: { property: "RAUMEINFLUSS", target: "HK1" }}

@@ -42,6 +42,7 @@ This project aims to provide all kinds of useful features for your Home Assistan
      the correct IDs.
 
 
+Forked from https://github.com/kr0ner/OneESP32ToRuleThemAll 
 
 Heavily inspired by this post in HA community forum:
 
