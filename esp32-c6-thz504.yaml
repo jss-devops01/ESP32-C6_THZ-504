@@ -72,11 +72,11 @@ sensor:
 
 # Memory and system info
 text_sensor:
-  - platform: debug
-    device:
-      name: "ESP32-C6 Device Info"
-    reset_reason:
-      name: "ESP32-C6 Reset Reason"
+#  - platform: debug
+#    device:
+#      name: "ESP32-C6 Device Info"
+#    reset_reason:
+#      name: "ESP32-C6 Reset Reason"
       
   - platform: wifi_info
     ip_address:

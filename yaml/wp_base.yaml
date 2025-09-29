@@ -6,7 +6,7 @@ esphome:
     then:
       - lambda: |-
           CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kPASSIVE_COOLING),[](const SimpleVariant& value){
-            const auto stringValue{Mapper::instance().getPassivkuehlung(value).value_or("Unbekannt")};
+            const auto stringValue{Mapper::instance().getPassivkuehlung(value).value_or("UNKNOWN")};
             const auto index = id(PASSIVE_COOLING).index_of(stringValue);
             if(index.has_value()) {
               id(PASSIVE_COOLING).publish_state(stringValue);
@@ -41,7 +41,10 @@ esphome:
           });
 
           id(ELECTRIC_BACKUP_HEATING).add_on_state_callback([](const bool state){
-            const auto electricHeatingPower = state ? id(BACKUP_HEATER_LEVEL_DHW).state * 230.0 /*V*/ * 12.6 /*A*/ : 0.0f;
+            float electricHeatingPower = 0.0f;
+            if (state && !isnan(id(BACKUP_HEATER_LEVEL_DHW).state)) {
+              electricHeatingPower = id(BACKUP_HEATER_LEVEL_DHW).state * 230.0 /*V*/ * 12.6 /*A*/;
+            }
             id(ELECTRIC_HEATING_POWER).publish_state(electricHeatingPower);
           });
 
@@ -91,13 +94,13 @@ select:
     name: "PASSIVE_COOLING"
     id: PASSIVE_COOLING
     options:
-      - "Aus"
-      - "Ablüften"
-      - "Zulüften"
-      - "Bypass"
-      - "Sommerkassette"
-      - "Unbekannt"
-    initial_option: "Unbekannt"
+      - "OFF"
+      - "EXHAUST_FLUSH"
+      - "FRESH_AIR_INTAKE"
+      - "BYPASS_MODE"
+      - "SUMMER_CASSETTE"
+      - "UNKNOWN"
+    initial_option: "UNKNOWN"
     optimistic: true
     setup_priority: 100
     set_action:
@@ -112,15 +115,15 @@ select:
     name: "PROGRAM_SWITCH"
     id: PROGRAM_SWITCH
     options:
-      - "Notbetrieb"
-      - "Bereitschaft"
-      - "Automatik"
-      - "Tagbetrieb"
-      - "Absenkbetrieb"
-      - "Warmwasser"
-      - "Handbetrieb"
-      - "Unbekannt"
-    initial_option: "Unbekannt"
+      - "EMERGENCY_MODE"
+      - "STANDBY_MODE"
+      - "AUTO_MODE"
+      - "DAY_MODE"
+      - "HOLIDAY_MODE"
+      - "DHW_MODE"
+      - "MANUAL_MODE"
+      - "UNKNOWN_MODE"
+    initial_option: "UNKNOWN_MODE"
     optimistic: true
     setup_priority: 100
     set_action:
@@ -149,6 +152,7 @@ sensor:
     state_class: measurement
     device_class: power
     unit_of_measurement: "W"
+    lambda: "return 0.0f;"  # Initialize with 0W (updated by callback)
 
 #########################################
 #                                       #
