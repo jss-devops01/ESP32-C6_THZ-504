@@ -72,14 +72,14 @@ time:
       - 1.pool.ntp.org
       - 2.pool.ntp.org
     on_time:
-      - seconds: 0
+      - seconds: 6
         minutes: 0
         hours: 3 # sync at 3 am should be ok even with switch from/to daylight saving time
         then:
           - lambda: |-
               syncTime();
       # Energy calculation schedules - every hour, every 5 minutes starting at 4th minute
-      - seconds: 0
+      - seconds: 1
         minutes: 4/5
         then:
           - lambda: |-
@@ -128,6 +128,18 @@ button:
       then:
         - lambda: |-
             syncTime();
+
+#########################################
+#                                       #
+#   Text Sensors (Debug)                #
+#                                       #
+#########################################
+text_sensor:
+  - platform: template
+    name: "Unknown CAN Property"
+    id: unknown_property_text
+    icon: "mdi:help-circle"
+    entity_category: diagnostic
 
 #########################################
 #                                       #
@@ -285,6 +297,32 @@ canbus:
             const auto [property, value] = processCanMessage(x);
             const auto canMember = getCanMemberByCanId(can_id);
             if(canMember) {
+              // Check if this is an unknown property
+              if(property.name == "UNKNOWN") {
+                // Log unknown property with full details - using ASCII only to avoid Unicode encoding issues
+                ESP_LOGW("UNKNOWN_PROPERTY", "===================================================");
+                ESP_LOGW("UNKNOWN_PROPERTY", "Unknown Property Detected!");
+                ESP_LOGW("UNKNOWN_PROPERTY", "CAN Member: %s (0x%03x)", canMember->get().name.c_str(), canMember->get().canId);
+                ESP_LOGW("UNKNOWN_PROPERTY", "Property ID: 0x%04x", property.id);
+                const int rawVal = static_cast<int>(value.get<float>());
+                ESP_LOGW("UNKNOWN_PROPERTY", "Raw Value: %d (0x%04x)", rawVal, rawVal);
+                ESP_LOGW("UNKNOWN_PROPERTY", "Decimal Value: %.2f", rawVal * 0.1);
+                ESP_LOGW("UNKNOWN_PROPERTY", "Raw CAN Frame: [%02x %02x %02x %02x %02x %02x %02x %02x]", 
+                         x.size() > 0 ? x[0] : 0, x.size() > 1 ? x[1] : 0, 
+                         x.size() > 2 ? x[2] : 0, x.size() > 3 ? x[3] : 0,
+                         x.size() > 4 ? x[4] : 0, x.size() > 5 ? x[5] : 0,
+                         x.size() > 6 ? x[6] : 0, x.size() > 7 ? x[7] : 0);
+                ESP_LOGW("UNKNOWN_PROPERTY", "===================================================");
+                
+                // Update the unknown property sensor
+                char buffer[200];
+                snprintf(buffer, sizeof(buffer), 
+                         "ID:0x%04x Src:%s Val:%d/%.2f", 
+                         property.id, canMember->get().name.c_str(), 
+                         rawVal, rawVal * 0.1);
+                id(unknown_property_text).publish_state(buffer);
+              }
+              
               auto callback = CallbackHandler::instance().getCallback(std::make_pair(canMember->get(),property));
               callback(value);
             } else {

@@ -64,6 +64,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(OUTSIDE_TEMP, 0x000c, Type::et_dec_val);
     PROPERTY(STORAGE_TEMP_ACTUAL, 0x000e, Type::et_dec_val);
     PROPERTY(ADJUSTED_ROOM_TEMP_SETPOINT, 0x0012, Type::et_dec_val);
+    PROPERTY(SOLAR_COLLECTOR_TEMP, 0x001a, Type::et_dec_val);
     PROPERTY(SLOPE_HC1, 0x010e, Type::et_cent_val);
     PROPERTY(WOCHENTAG, 0x0121, Type::et_little_endian);
     PROPERTY(TAG, 0x0122, Type::et_little_endian);
@@ -71,6 +72,9 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(JAHR, 0x0124, Type::et_little_endian);
     PROPERTY(STUNDE, 0x0125, Type::et_little_endian);
     PROPERTY(MINUTE, 0x0126, Type::et_little_endian);
+    PROPERTY(CONDENSER_INLET_TEMP, 0x059c, Type::et_little_endian);
+    PROPERTY(OIL_PAN_TEMP, 0x0693, Type::et_little_endian);
+    PROPERTY(HOT_GAS_TEMP, 0x0265, Type::et_little_endian);
     PROPERTY(FLOW_SHARE_HC1, 0x059d);
     PROPERTY(BASE_POINT_HC1, 0x059e, Type::et_dec_val);
     PROPERTY(ELECTRIC_ENERGY_DHW_DAY_WH, 0x091a);
@@ -107,6 +111,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(SETPOINT_MIN_HC1, 0x012b, Type::et_dec_val);
     PROPERTY(HYSTERESIS_DHW, 0x0140, Type::et_dec_val);
     PROPERTY(BETRIEBS_STATUS, 0x0176);
+    PROPERTY(Z_SOMETHING_01, 0x0190, Type::et_dec_val);
     PROPERTY(VOLUME_FLOW, 0x01da, Type::et_dec_val);
     PROPERTY(DEWPOINT_HC1, 0x0264, Type::et_dec_val);
     PROPERTY(COOLING_MODE, 0x0287, Type::et_bool);

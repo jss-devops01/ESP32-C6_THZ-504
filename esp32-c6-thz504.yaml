@@ -28,7 +28,12 @@ esp32:
 
 # Enable logging
 logger:
-  level: INFO
+  level: DEBUG  # Set to DEBUG to allow detailed CAN logging
+  logs:
+    UNKNOWN_PROPERTY: WARN  # Always show unknown properties
+    Communication: INFO      # Show CAN communication
+    CAN: DEBUG              # Detailed CAN bus info
+    light: WARN
 
 # Enable Home Assistant API
 api:
