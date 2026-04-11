@@ -11,3 +11,5 @@ tmp/
 *.pyc
 upload-log.txt
 upload-log.txt
+esp32_capture.log
+esp32_stubs.txt

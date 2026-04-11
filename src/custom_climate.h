@@ -3,12 +3,12 @@
 
 class CustomClimate : public Component, public Climate {
    public:
-    CustomClimate(std::set<ClimateMode> modes, std::set<ClimatePreset> presets,
+    CustomClimate(std::initializer_list<ClimateMode> modes, std::initializer_list<ClimatePreset> presets,
                   const std::vector<std::pair<const CanMember, const Property>> targetTemperatureProperties)
         : targetTemperatureProperties_(targetTemperatureProperties) {
-        traits_.set_supported_modes(std::move(modes));
-        traits_.set_supported_presets(std::move(presets));
-        traits_.set_supports_current_temperature(true);
+        traits_.set_supported_modes(modes);
+        traits_.set_supported_presets(presets);
+        traits_.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
         update_mode();
     }
 

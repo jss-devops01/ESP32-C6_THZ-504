@@ -84,6 +84,9 @@ esphome:
           });
           scheduleRequest(Kessel, Property::kBETRIEBS_STATUS, std::chrono::seconds(10));
 
+          // Force regular updates for DRUCK_HEIZKREIS (heating circuit pressure)
+          scheduleRequest(Manager, Property::kDRUCK_HEIZKREIS, std::chrono::seconds(30));
+
 #########################################
 #                                       #
 #   Selects                             #
@@ -284,11 +287,19 @@ packages:
   VOLUME_FLOW:                         !include { file: wp_generic.yaml, vars: { property: "VOLUME_FLOW"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   FILTER_RUNTIME:                      !include { file: wp_generic.yaml, vars: { property: "FILTER_RUNTIME"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
   LOW_PRESSURE_DISPLAY:                !include { file: wp_generic.yaml, vars: { property: "LOW_PRESSURE_DISPLAY"      , accuracy_decimals: "2" }}
+  DRUCK_HEIZKREIS:                     !include { file: wp_generic.yaml, vars: { property: "DRUCK_HEIZKREIS"           , accuracy_decimals: "2", unit: "bar", scaler: "1.0" }}
+  UNKNOWN_019A:                        !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_019A"              , accuracy_decimals: "2", scaler: "1.0" }}
+
+  # Note: Many additional properties (like DRUCK_HOCHDRUCK, DRUCK_NIEDERDRUCK, QUELLE_IST, QUELLENTEMP_MIN, PUFFERISTTEMP, 
+  # QUELLENDRUCK, LEISTUNG_HEIZKREISPUMPE, LEISTUNG_SOLEPUMPE) are only available when TTF_07_C is defined in src/property.h.
+  # They are not enabled in the default THZ_504 build.
+  # Most useful properties are already exposed above (COMPRESSOR_SPEED, MOTOR_POWER, HEATING_COOLING_POWER, etc.).
   PUMP_CYCLES_MIN_OUTSIDE_TEMP:        !include { file: wp_generic.yaml, vars: { property: "PUMP_CYCLES_MIN_OUTSIDE_TEMP" , icon: "mdi:numeric"  }}
   SETPOINT_MAX_HC1:                    !include { file: wp_generic.yaml, vars: { property: "SETPOINT_MAX_HC1"          , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
   SETPOINT_MIN_HC1:                    !include { file: wp_generic.yaml, vars: { property: "SETPOINT_MIN_HC1"          , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
   FLOW_SHARE_HC1:                      !include { file: wp_generic.yaml, vars: { property: "FLOW_SHARE_HC1"            , unit: "%" , icon: "mdi:percent-box"         , target: "HK1" }}
   BASE_POINT_HC1:                      !include { file: wp_generic.yaml, vars: { property: "BASE_POINT_HC1"             , unit: "°C", icon: "mdi:temperature-celsius" , target: "HK1", accuracy_decimals: "1" }}
+  FROST_PROTECTION_TEMP_HC2:           !include { file: wp_temperature.yaml, vars: { property: "FROST_PROTECTION_TEMP_HC2" , target: "Manager" }}
 
   BACKUP_HEATER_LEVEL_DHW:             !include { file: wp_number.yaml, vars: { property: "BACKUP_HEATER_LEVEL_DHW"                , min: "0" , max: "3"  }}
   DESIGN_POWER_HEATING:                !include { file: wp_number.yaml, vars: { property: "DESIGN_POWER_HEATING"       , min: "40", max: "100"}}

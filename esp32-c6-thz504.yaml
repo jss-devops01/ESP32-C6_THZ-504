@@ -39,13 +39,16 @@ logger:
 api:
   encryption:
     key: !secret api_encryption_key
-
+  #listen_backlog: 2  # Allow 2 pending connections in queue
+  #max_connections: 6  # Allow up to 6 simultaneous connections
+  #max_send_queue: 10  # Maximum queued messages per connection before disconnect
 ota:
   platform: esphome
   password: !secret ota_password
 
 web_server:
   port: 80
+  version: 3
 
 # Debug and monitoring components
 debug:

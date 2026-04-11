@@ -35,8 +35,8 @@ substitutions:
   espclient_can_id: "0x6a2"
 
   # Home Assistant entities
-  entity_room_temperature: "sensor.durchschnittstemperatur_haus_ohne_keller"
-  entity_humidity: "sensor.durchschnitt_luftfeuchtigkeit_haus"
+  entity_room_temperature: "sensor.durchschnittstemperatur_haus_ohne_keller"  # Average temperature of the house (excluding basement)
+  entity_humidity: "sensor.durchschnitt_luftfeuchtigkeit_haus"                # Average humidity of the house
 
 #########################################
 #                                       #
@@ -205,7 +205,9 @@ api:
             const auto use_extended_id{false};
             std::vector<std::uint8_t> payload;
             payload.resize(data.size());
-            std::transform(data.cbegin(),data.cend(),payload.begin(),[](const auto in){ return static_cast<std::uint8_t>(in);});
+            std::transform(data.begin(), data.end(), payload.begin(), [](const auto in) {
+              return static_cast<std::uint8_t>(in);
+            });
             id(wp_can).send_data(ESPClient.canId, use_extended_id, payload);
     - action: can_send_value
       variables:
@@ -293,36 +295,77 @@ canbus:
       can_id_mask: 0
       then:
         - lambda: |-
+            // Basic CAN id log
             ESP_LOGD("CAN", "Can message received with CANId 0x%04lx", can_id);
+
+            // Log raw payload bytes to help debugging (up to 8 bytes)
+            ESP_LOGD("CAN", "Raw CAN Frame: [%02x %02x %02x %02x %02x %02x %02x %02x]", 
+                     x.size() > 0 ? x[0] : 0, x.size() > 1 ? x[1] : 0,
+                     x.size() > 2 ? x[2] : 0, x.size() > 3 ? x[3] : 0,
+                     x.size() > 4 ? x[4] : 0, x.size() > 5 ? x[5] : 0,
+                     x.size() > 6 ? x[6] : 0, x.size() > 7 ? x[7] : 0);
+
             const auto [property, value] = processCanMessage(x);
             const auto canMember = getCanMemberByCanId(can_id);
-            if(canMember) {
-              // Check if this is an unknown property
-              if(property.name == "UNKNOWN") {
-                // Log unknown property with full details - using ASCII only to avoid Unicode encoding issues
+
+            // Re-extract the raw integer value from the frame so we can always log it alongside the converted value
+            int rawVal = 0;
+            if (x.size() >= 7U) {
+              uint8_t b1 = 0U, b2 = 0U;
+              if (x[2U] == 0xfa) {
+                b1 = x[5U];
+                b2 = x[6U];
+              } else {
+                b1 = x[3U];
+                b2 = x[4U];
+              }
+              rawVal = static_cast<int>((b1 << 8U) | b2);
+            }
+
+            if (canMember) {
+              // Log decoded property / value for every received frame
+              ESP_LOGI("Communication", "Decoded: CAN Member=%s CANId=0x%03x Property=%s (0x%04x) Raw=%d (0x%04x)",
+                       canMember->get().name.c_str(), canMember->get().canId,
+                       std::string(property.name).c_str(), property.id, rawVal, rawVal);
+
+              // If the property uses decimal representation (×0.1) print the converted value
+              if (property.type == Type::et_dec_val) {
+                ESP_LOGI("Communication", "Converted value: %.2f (type=et_dec_val)", rawVal * 0.1f);
+              }
+
+              // Special highlight for heating circuit pressure (DRUCK_HEIZKREIS)
+              if (property.id == Property::kDRUCK_HEIZKREIS) {
+                const float pressure_bar = rawVal * 0.1f; // pressures use et_dec_val -> value * 0.1
+                if (pressure_bar < 1.5f) {
+                  ESP_LOGW("PRESSURE", "Heating circuit pressure LOW: %.2f bar (expected ~2.0 bar)", pressure_bar);
+                } else {
+                  ESP_LOGI("PRESSURE", "Heating circuit pressure: %.2f bar", pressure_bar);
+                }
+              }
+
+              // Check if this is an unknown property and keep the existing, detailed unknown logging
+              if (property.name == "UNKNOWN") {
                 ESP_LOGW("UNKNOWN_PROPERTY", "===================================================");
                 ESP_LOGW("UNKNOWN_PROPERTY", "Unknown Property Detected!");
                 ESP_LOGW("UNKNOWN_PROPERTY", "CAN Member: %s (0x%03x)", canMember->get().name.c_str(), canMember->get().canId);
                 ESP_LOGW("UNKNOWN_PROPERTY", "Property ID: 0x%04x", property.id);
-                const int rawVal = static_cast<int>(value.get<float>());
                 ESP_LOGW("UNKNOWN_PROPERTY", "Raw Value: %d (0x%04x)", rawVal, rawVal);
-                ESP_LOGW("UNKNOWN_PROPERTY", "Decimal Value: %.2f", rawVal * 0.1);
+                ESP_LOGW("UNKNOWN_PROPERTY", "Decimal Value: %.2f", rawVal * 0.1f);
                 ESP_LOGW("UNKNOWN_PROPERTY", "Raw CAN Frame: [%02x %02x %02x %02x %02x %02x %02x %02x]", 
                          x.size() > 0 ? x[0] : 0, x.size() > 1 ? x[1] : 0, 
                          x.size() > 2 ? x[2] : 0, x.size() > 3 ? x[3] : 0,
                          x.size() > 4 ? x[4] : 0, x.size() > 5 ? x[5] : 0,
                          x.size() > 6 ? x[6] : 0, x.size() > 7 ? x[7] : 0);
                 ESP_LOGW("UNKNOWN_PROPERTY", "===================================================");
-                
-                // Update the unknown property sensor
+
                 char buffer[200];
                 snprintf(buffer, sizeof(buffer), 
                          "ID:0x%04x Src:%s Val:%d/%.2f", 
                          property.id, canMember->get().name.c_str(), 
-                         rawVal, rawVal * 0.1);
+                         rawVal, rawVal * 0.1f);
                 id(unknown_property_text).publish_state(buffer);
               }
-              
+
               auto callback = CallbackHandler::instance().getCallback(std::make_pair(canMember->get(),property));
               callback(value);
             } else {

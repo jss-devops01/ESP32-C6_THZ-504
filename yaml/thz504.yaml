@@ -10,3 +10,26 @@ packages:
   EXHAUST_AIR_DEWPOINT: !include { file: wp_temperature.yaml, vars: { property: "EXHAUST_AIR_DEWPOINT" }}
   DIFFERENTIAL_PRESSURE:       !include { file: wp_generic.yaml, vars: { property: "DIFFERENTIAL_PRESSURE"      , icon: "mdi:air-filter", unit: "Pa", update_interval: $interval_medium          }}
   FILTER_RUNTIME_DAYS: !include { file: wp_generic.yaml, vars: { property: "FILTER_RUNTIME_DAYS", icon: "mdi:air-filter", unit: "d" , update_interval: $interval_once_in_a_while }}
+
+  # ======================================================================
+  # Auto-discovered properties — purpose unconfirmed, rename when identified
+  # Run analyze-unknown-properties.ps1 after a menu-browsing session to discover more
+  # ======================================================================
+
+  # Refrigerant circuit sensors (block near LOW_PRESSURE_DISPLAY=0x07a7)
+  UNKNOWN_07A8: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07A8", icon: "mdi:gauge",       unit: "bar", update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=26 raw=19 → 1.9 (high pressure display?)
+  UNKNOWN_07F4: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F4", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=321..324 → 32.1..32.4°C
+  UNKNOWN_07F5: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F5", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=382..383 → 38.2..38.3°C
+  UNKNOWN_07F6: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F6", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=168 → 16.8°C
+  UNKNOWN_07F7: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F7", icon: "mdi:gauge",       unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=984..988 → 98.4..98.8
+  UNKNOWN_07F9: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F9", icon: "mdi:gauge",       unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=1000 → 100.0
+  UNKNOWN_07FB: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07FB", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=200 → 20.0°C
+
+  # High-frequency real-time values (seen 18-44 times per 5 min)
+  UNKNOWN_0B9B: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0B9B", icon: "mdi:help-circle", unit: "",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=18 raw=0..15
+  UNKNOWN_0B9F: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0B9F", icon: "mdi:timer",       unit: "s",  update_interval: $interval_slow, accuracy_decimals: "0" }}  # seen=20 raw=0..59 (seconds timer?)
+  UNKNOWN_0BA0: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0BA0", icon: "mdi:help-circle", unit: "",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=23 raw=0..26
+  UNKNOWN_0BA3: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0BA3", icon: "mdi:help-circle", unit: "",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=23 raw=0..26
+
+  # Varying active flag (the only bool that changed value during capture)
+  UNKNOWN_027A: !include { file: wp_binary.yaml, vars: { name: "UNKNOWN_027A" }}  # seen=4 raw=0..1

@@ -178,6 +178,124 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(DIFFERENTIAL_PRESSURE, 0xc11e);
     PROPERTY(BETRIEBS_STATUS_2, 0xc356);
     PROPERTY(ZEITSPERRE_NE, 0x0588);
+    PROPERTY(UNKNOWN_019A, 0x019a, Type::et_dec_val);
+    PROPERTY(FROST_PROTECTION_TEMP_HC2, 0x013d, Type::et_dec_val);
+
+    // ======================================================================
+    // Auto-discovered properties — run analyze-unknown-properties.ps1 to add more
+    // Rename and move above this block once purpose is confirmed.
+    // ======================================================================
+
+    // --- Refrigerant circuit sensors (0x07xx block, near LOW_PRESSURE_DISPLAY=0x07a7) ---
+    PROPERTY(UNKNOWN_07A6, 0x07a6);                         // src=Kessel seen=2 raw=1643 (large, maybe runtime counter)
+    PROPERTY(UNKNOWN_07A8, 0x07a8, Type::et_dec_val);       // src=Kessel seen=26 raw=19 → 1.9 (high pressure candidate?)
+    PROPERTY(UNKNOWN_07CA, 0x07ca, Type::et_bool);          // src=Kessel seen=4 raw=0
+    PROPERTY(UNKNOWN_07F2, 0x07f2, Type::et_bool);          // src=Kessel seen=4 raw=0
+    PROPERTY(UNKNOWN_07F3, 0x07f3, Type::et_dec_val);       // src=Kessel seen=4 raw=80 → 8.0
+    PROPERTY(UNKNOWN_07F4, 0x07f4, Type::et_dec_val);       // src=Kessel seen=4 raw=321..324 → 32.1..32.4°C (condenser temp?)
+    PROPERTY(UNKNOWN_07F5, 0x07f5, Type::et_dec_val);       // src=Kessel seen=4 raw=382..383 → 38.2..38.3°C (condenser temp?)
+    PROPERTY(UNKNOWN_07F6, 0x07f6, Type::et_dec_val);       // src=Kessel seen=4 raw=168 → 16.8°C
+    PROPERTY(UNKNOWN_07F7, 0x07f7, Type::et_dec_val);       // src=Kessel seen=4 raw=984..988 → 98.4..98.8
+    PROPERTY(UNKNOWN_07F8, 0x07f8, Type::et_cent_val);      // src=Kessel seen=4 raw=1245 → 12.45
+    PROPERTY(UNKNOWN_07F9, 0x07f9, Type::et_dec_val);       // src=Kessel seen=4 raw=1000 → 100.0
+    PROPERTY(UNKNOWN_07FA, 0x07fa, Type::et_bool);          // src=Kessel seen=4 raw=0
+    PROPERTY(UNKNOWN_07FB, 0x07fb, Type::et_dec_val);       // src=Kessel seen=4 raw=200 → 20.0°C
+    PROPERTY(UNKNOWN_081C, 0x081c, Type::et_bool);          // src=Kessel seen=4 raw=0
+
+    // --- High-frequency values (0x0b9x block, seen 18-44 times in 5 min) ---
+    PROPERTY(UNKNOWN_0B9A, 0x0b9a, Type::et_dec_val);       // src=Manager seen=44 raw=0..9
+    PROPERTY(UNKNOWN_0B9B, 0x0b9b, Type::et_dec_val);       // src=Kessel seen=18 raw=0..15
+    PROPERTY(UNKNOWN_0B9F, 0x0b9f, Type::et_dec_val);       // src=Kessel seen=20 raw=0..59 (seconds counter?)
+    PROPERTY(UNKNOWN_0BA0, 0x0ba0, Type::et_dec_val);       // src=Kessel seen=23 raw=0..26
+    PROPERTY(UNKNOWN_0BA1, 0x0ba1, Type::et_bool);          // src=Kessel seen=19 raw=0
+    PROPERTY(UNKNOWN_0BA2, 0x0ba2, Type::et_bool);          // src=Kessel seen=20 raw=0
+    PROPERTY(UNKNOWN_0BA3, 0x0ba3, Type::et_dec_val);       // src=Kessel seen=23 raw=0..26
+
+    // --- Active flags and status bits ---
+    PROPERTY(UNKNOWN_0060, 0x0060, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0067, 0x0067, Type::et_dec_val);       // src=Kessel seen=4 raw=2
+    PROPERTY(UNKNOWN_011A, 0x011a, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_01D3, 0x01d3, Type::et_bool);          // src=Kessel seen=6 raw=0
+    PROPERTY(UNKNOWN_027A, 0x027a, Type::et_bool);          // src=Kessel seen=4 raw=0..1 (varies!)
+    PROPERTY(UNKNOWN_02CE, 0x02ce, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_02F5, 0x02f5, Type::et_bool);          // src=Kessel seen=2 raw=1
+    PROPERTY(UNKNOWN_03C1, 0x03c1, Type::et_bool);          // src=Kessel seen=2 raw=1
+    PROPERTY(UNKNOWN_05A5, 0x05a5, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_05B8, 0x05b8, Type::et_bool);          // src=Kessel seen=2 raw=1
+    PROPERTY(UNKNOWN_05B9, 0x05b9, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_05BC, 0x05bc, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_05C7, 0x05c7, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_05D1, 0x05d1, Type::et_bool);          // src=Kessel seen=4 raw=0
+    PROPERTY(UNKNOWN_065A, 0x065a, Type::et_bool);          // src=Kessel seen=4 raw=0
+    PROPERTY(UNKNOWN_0695, 0x0695, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_06A3, 0x06a3, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0944, 0x0944, Type::et_bool);          // src=Kessel seen=2 raw=1
+    PROPERTY(UNKNOWN_C0D8, 0xc0d8, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_C0DE, 0xc0de, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_C113, 0xc113, Type::et_bool);          // src=Kessel seen=2 raw=0
+
+    // --- Heating circuit / pump sensors (0x064x block, near DRUCK_HEIZKREIS=0x064a) ---
+    PROPERTY(UNKNOWN_0640, 0x0640);                         // src=Kessel seen=2 raw=993
+    PROPERTY(UNKNOWN_0641, 0x0641);                         // src=Kessel seen=2 raw=2
+    PROPERTY(UNKNOWN_0642, 0x0642);                         // src=Kessel seen=2 raw=795
+    PROPERTY(UNKNOWN_0643, 0x0643, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0644, 0x0644);                         // src=Kessel seen=2 raw=944
+    PROPERTY(UNKNOWN_0645, 0x0645, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0646, 0x0646);                         // src=Kessel seen=2 raw=570
+    PROPERTY(UNKNOWN_0647, 0x0647);                         // src=Kessel seen=2 raw=6
+    PROPERTY(UNKNOWN_0648, 0x0648, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0649, 0x0649, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_064C, 0x064c, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_064D, 0x064d);                         // src=Kessel seen=2 raw=9809
+    PROPERTY(UNKNOWN_0652, 0x0652, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0653, 0x0653, Type::et_bool);          // src=Kessel seen=2 raw=0
+    PROPERTY(UNKNOWN_0654, 0x0654, Type::et_bool);          // src=Kessel seen=2 raw=1
+    PROPERTY(UNKNOWN_06A2, 0x06a2);                         // src=Kessel seen=2 raw=250
+
+    // --- Config-range values (0x011x, 0x01bx, 0x02x, 0x03x) ---
+    PROPERTY(UNKNOWN_011B, 0x011b, Type::et_cent_val);      // src=Kessel seen=4 raw=6912 → 69.12
+    PROPERTY(UNKNOWN_011C, 0x011c, Type::et_dec_val);       // src=Kessel seen=4 raw=768 → 76.8
+    PROPERTY(UNKNOWN_011D, 0x011d, Type::et_cent_val);      // src=Kessel seen=4 raw=6656 → 66.56
+    PROPERTY(UNKNOWN_011E, 0x011e);                         // src=Manager seen=2 raw=1280
+    PROPERTY(UNKNOWN_011F, 0x011f, Type::et_cent_val);      // src=Kessel seen=4 raw=1024 → 10.24
+    PROPERTY(UNKNOWN_0120, 0x0120);                         // src=Manager seen=2 raw=6656
+    PROPERTY(UNKNOWN_01B8, 0x01b8);                         // src=Kessel seen=2 raw=80
+    PROPERTY(UNKNOWN_01BB, 0x01bb);                         // src=Kessel seen=2 raw=250
+    PROPERTY(UNKNOWN_01BC, 0x01bc);                         // src=Kessel seen=2 raw=3
+    PROPERTY(UNKNOWN_01BD, 0x01bd);                         // src=Kessel seen=2 raw=400
+    PROPERTY(UNKNOWN_02CC, 0x02cc);                         // src=Kessel seen=2 raw=800
+    PROPERTY(UNKNOWN_02F6, 0x02f6);                         // src=Kessel seen=2 raw=800
+    PROPERTY(UNKNOWN_03AB, 0x03ab);                         // src=Kessel seen=2 raw=10
+    PROPERTY(UNKNOWN_03B8, 0x03b8, Type::et_cent_val);      // src=Kessel seen=4 raw=1800 → 18.00
+    PROPERTY(UNKNOWN_03BB, 0x03bb);                         // src=Kessel seen=2 raw=1250
+
+    // --- Ventilation config range (0x05xx, near VENT_LEVEL_xxx) ---
+    PROPERTY(UNKNOWN_058F, 0x058f);                         // src=Kessel seen=2 raw=12
+    PROPERTY(UNKNOWN_05A4, 0x05a4);                         // src=Kessel seen=2 raw=13370
+    PROPERTY(UNKNOWN_05A7, 0x05a7);                         // src=Kessel seen=2 raw=130
+    PROPERTY(UNKNOWN_05B2, 0x05b2);                         // src=Kessel seen=2 raw=300
+    PROPERTY(UNKNOWN_05B5, 0x05b5);                         // src=Kessel seen=2 raw=20
+    PROPERTY(UNKNOWN_05B6, 0x05b6);                         // src=Kessel seen=2 raw=60
+    PROPERTY(UNKNOWN_05B7, 0x05b7);                         // src=Kessel seen=2 raw=50
+    PROPERTY(UNKNOWN_05BA, 0x05ba);                         // src=Kessel seen=2 raw=200
+    PROPERTY(UNKNOWN_05BE, 0x05be);                         // src=Kessel seen=2 raw=750
+    PROPERTY(UNKNOWN_05D3, 0x05d3, Type::et_dec_val);       // src=Kessel seen=4 raw=76 → 7.6
+
+    // --- High-range / HK1 values ---
+    PROPERTY(UNKNOWN_1410, 0x1410, Type::et_cent_val);      // src=HK1 seen=4 raw=6234 → 62.34
+    PROPERTY(UNKNOWN_1411, 0x1411);                         // src=HK1 seen=4 raw=32896 (0x8080, may be invalid marker)
+    PROPERTY(UNKNOWN_1412, 0x1412);                         // src=HK1 seen=2 raw=32896
+    PROPERTY(UNKNOWN_1710, 0x1710);                         // src=Kessel seen=2 raw=14930
+    PROPERTY(UNKNOWN_1711, 0x1711);                         // src=Kessel seen=2 raw=32896
+    PROPERTY(UNKNOWN_1712, 0x1712);                         // src=Kessel seen=2 raw=32896
+    PROPERTY(UNKNOWN_1D10, 0x1d10);                         // src=Kessel seen=2 raw=6182
+    PROPERTY(UNKNOWN_1D11, 0x1d11);                         // src=Kessel seen=2 raw=11831
+    PROPERTY(UNKNOWN_1D12, 0x1d12);                         // src=Kessel seen=2 raw=19030
+
+    // --- 0xC0xx extended range ---
+    PROPERTY(UNKNOWN_C0AD, 0xc0ad);                         // src=Kessel seen=2 raw=20
+    PROPERTY(UNKNOWN_C0E2, 0xc0e2);                         // src=Kessel seen=2 raw=2
+    PROPERTY(UNKNOWN_C0E3, 0xc0e3);                         // src=Kessel seen=2 raw=0..100 (percentage?)
 #endif
 
 
