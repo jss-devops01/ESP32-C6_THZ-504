@@ -2,4 +2,4 @@ binary_sensor:
   - platform: template
     name: ${name}
     id: ${name}
-    publish_initial_state: true
+    trigger_on_initial_state: true

@@ -19,23 +19,23 @@ esphome:
                 // publish the value
                 id(HEATPUMP_DATETIME).state = std::string(buf);
             };
-            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kJAHR),[updateTime](const SimpleVariant& value){
+            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kYEAR),[updateTime](const SimpleVariant& value){
               updateTime([&value](ESPTime& timeToSet){
                 timeToSet.year = 2000U + static_cast<std::uint16_t>(value);
               });
             });
-            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kMONAT),[updateTime](const SimpleVariant& value){
+            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kMONTH),[updateTime](const SimpleVariant& value){
               updateTime([&value](ESPTime& timeToSet){
                 timeToSet.month = static_cast<std::uint16_t>(value);
               });
             });
-            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kWOCHENTAG),[](const SimpleVariant&){});
-            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kTAG),[updateTime](const SimpleVariant& value){
+            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kDAY_OF_WEEK),[](const SimpleVariant&){});
+            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kDAY_OF_MONTH),[updateTime](const SimpleVariant& value){
               updateTime([&value](ESPTime& timeToSet){
                 timeToSet.day_of_month = static_cast<std::uint16_t>(value);
               });
             });
-            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kSTUNDE),[updateTime](const SimpleVariant& value){
+            CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kHOUR),[updateTime](const SimpleVariant& value){
               updateTime([&value](ESPTime& timeToSet){
                 timeToSet.hour = static_cast<std::uint16_t>(value);
               });
@@ -46,10 +46,10 @@ esphome:
               });
               id(HEATPUMP_DATETIME).publish_state(id(HEATPUMP_DATETIME).state);
             });
-            queueRequest(Kessel, Property::kJAHR);
-            queueRequest(Kessel, Property::kMONAT);
-            queueRequest(Kessel, Property::kTAG);
-            queueRequest(Kessel, Property::kSTUNDE);
+            queueRequest(Kessel, Property::kYEAR);
+            queueRequest(Kessel, Property::kMONTH);
+            queueRequest(Kessel, Property::kDAY_OF_MONTH);
+            queueRequest(Kessel, Property::kHOUR);
             queueRequest(Kessel, Property::kMINUTE);
 
 text_sensor:

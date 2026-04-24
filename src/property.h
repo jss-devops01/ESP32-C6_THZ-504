@@ -66,11 +66,11 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(ADJUSTED_ROOM_TEMP_SETPOINT, 0x0012, Type::et_dec_val);
     PROPERTY(SOLAR_COLLECTOR_TEMP, 0x001a, Type::et_dec_val);
     PROPERTY(SLOPE_HC1, 0x010e, Type::et_cent_val);
-    PROPERTY(WOCHENTAG, 0x0121, Type::et_little_endian);
-    PROPERTY(TAG, 0x0122, Type::et_little_endian);
-    PROPERTY(MONAT, 0x0123, Type::et_little_endian);
-    PROPERTY(JAHR, 0x0124, Type::et_little_endian);
-    PROPERTY(STUNDE, 0x0125, Type::et_little_endian);
+    PROPERTY(DAY_OF_WEEK, 0x0121, Type::et_little_endian);
+    PROPERTY(DAY_OF_MONTH, 0x0122, Type::et_little_endian);
+    PROPERTY(MONTH, 0x0123, Type::et_little_endian);
+    PROPERTY(YEAR, 0x0124, Type::et_little_endian);
+    PROPERTY(HOUR, 0x0125, Type::et_little_endian);
     PROPERTY(MINUTE, 0x0126, Type::et_little_endian);
     PROPERTY(CONDENSER_INLET_TEMP, 0x059c, Type::et_little_endian);
     PROPERTY(OIL_PAN_TEMP, 0x0693, Type::et_little_endian);
@@ -107,10 +107,10 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(FLOW_TEMP_ACTUAL, 0x000f, Type::et_dec_val);
     PROPERTY(STORAGE_TEMP_SETPOINT_DAY, 0x0013, Type::et_dec_val);
     PROPERTY(SETPOINT_MAX_HC1, 0x0028, Type::et_dec_val);
-    PROPERTY(SOMMERBETRIEB_TEMP, 0x0116, Type::et_dec_val);
+    PROPERTY(SUMMER_MODE_TEMP, 0x0116, Type::et_dec_val);
     PROPERTY(SETPOINT_MIN_HC1, 0x012b, Type::et_dec_val);
     PROPERTY(HYSTERESIS_DHW, 0x0140, Type::et_dec_val);
-    PROPERTY(BETRIEBS_STATUS, 0x0176);
+    PROPERTY(OPERATING_STATUS, 0x0176);
     PROPERTY(Z_SOMETHING_01, 0x0190, Type::et_dec_val);
     PROPERTY(VOLUME_FLOW, 0x01da, Type::et_dec_val);
     PROPERTY(DEWPOINT_HC1, 0x0264, Type::et_dec_val);
@@ -122,16 +122,16 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(HEAT_RECOVERY_TOTAL_KWH, 0x03b0);
     PROPERTY(HEAT_RECOVERY_TOTAL_MWH, 0x03b1);
     PROPERTY(COOLING_ROOM_SETPOINT_DAY, 0x0569, Type::et_dec_val);
-    PROPERTY(KUEHL_RAUMSOLL_ABWESEND, 0x056a, Type::et_dec_val);
-    PROPERTY(KUEHL_RAUMSOLL_NACHT, 0x056b, Type::et_dec_val);
+    PROPERTY(COOLING_ROOM_SETPOINT_ABSENT, 0x056a, Type::et_dec_val);
+    PROPERTY(COOLING_ROOM_SETPOINT_NIGHT, 0x056b, Type::et_dec_val);
     PROPERTY(VENT_LEVEL_DAY, 0x056c);
     PROPERTY(VENT_LEVEL_NIGHT, 0x056d);
-    PROPERTY(LUEFT_STUFE_BEREITSCHAFT, 0x056f);
+    PROPERTY(VENT_LEVEL_STANDBY, 0x056f);
     PROPERTY(VENT_LEVEL_PARTY, 0x0570);
     PROPERTY(PASSIVE_COOLING, 0x0575);
-    PROPERTY(LUEFT_ZEIT_AUSSERPLAN_STUFE1, 0x0572);
-    PROPERTY(LUEFT_ZEIT_AUSSERPLAN_STUFE2, 0x0573);
-    PROPERTY(LUEFT_ZEIT_AUSSERPLAN_STUFE3, 0x0574);
+    PROPERTY(VENT_UNPLANNED_DURATION_LEVEL1, 0x0572);
+    PROPERTY(VENT_UNPLANNED_DURATION_LEVEL2, 0x0573);
+    PROPERTY(VENT_UNPLANNED_DURATION_LEVEL3, 0x0574);
     PROPERTY(VENT_SUPPLY_LEVEL1, 0x0576);
     PROPERTY(VENT_SUPPLY_LEVEL2, 0x0577);
     PROPERTY(VENT_SUPPLY_LEVEL3, 0x0578);
@@ -146,12 +146,12 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(EXHAUST_AIR_ACTUAL, 0x0599);
     PROPERTY(OUTDOOR_AIR_SETPOINT, 0x059a);
     PROPERTY(OUTDOOR_AIR_ACTUAL, 0x059b);
-    PROPERTY(SOMMERBETRIEB_HYSTERESE, 0x05a2, Type::et_dec_val);
+    PROPERTY(SUMMER_MODE_HYSTERESIS, 0x05a2, Type::et_dec_val);
     PROPERTY(PUMP_CYCLES_MIN_OUTSIDE_TEMP, 0x05bb);
     PROPERTY(STORAGE_TEMP_SETPOINT_NIGHT, 0x05bf, Type::et_dec_val);
-    PROPERTY(LUEFT_STUFE_HAND, 0x0612);
-    PROPERTY(KUEHLSYSTEM, 0x0613);
-    PROPERTY(DRUCK_HEIZKREIS, 0x064a, Type::et_dec_val);
+    PROPERTY(VENT_LEVEL_MANUAL, 0x0612);
+    PROPERTY(COOLING_SYSTEM_TYPE, 0x0613);
+    PROPERTY(HEATING_CIRCUIT_PRESSURE, 0x064a, Type::et_dec_val);
     PROPERTY(DESIGN_POWER_COOLING, 0x0692);
     PROPERTY(HEATING_POWER_RELATIVE, 0x069a, Type::et_double_val);
     PROPERTY(COMPRESSOR_SPEED, 0x069e);
@@ -172,51 +172,53 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(EXHAUST_AIR_HUMIDITY, 0xc0ef);
     PROPERTY(DESIGN_POWER_HEATING, 0xc0f1);
     PROPERTY(COMPRESSOR_STARTS, 0xc0f4);
-    PROPERTY(VERDICHTER_STARTS_K, 0xc0f5);
+    PROPERTY(COMPRESSOR_STARTS_KILO, 0xc0f5);
     PROPERTY(EXHAUST_AIR_DEWPOINT, 0xc0f6, Type::et_dec_val);
     PROPERTY(FILTER_RUNTIME, 0xc111);
     PROPERTY(DIFFERENTIAL_PRESSURE, 0xc11e);
-    PROPERTY(BETRIEBS_STATUS_2, 0xc356);
-    PROPERTY(ZEITSPERRE_NE, 0x0588);
+    PROPERTY(OPERATING_STATUS_2, 0xc356);
+    PROPERTY(BACKUP_HEATER_TIME_LOCK, 0x0588);
     PROPERTY(UNKNOWN_019A, 0x019a, Type::et_dec_val);
     PROPERTY(FROST_PROTECTION_TEMP_HC2, 0x013d, Type::et_dec_val);
 
     // ======================================================================
-    // Auto-discovered properties — run analyze-unknown-properties.ps1 to add more
-    // Rename and move above this block once purpose is confirmed.
+    // Identified properties — cross-referenced against goelster Elster table
+    // (https://github.com/andig/goelster/blob/master/readings.go)
+    // Remaining UNKNOWN_xxxx entries still need identification.
+    // Run analyze-unknown-properties.ps1 after a menu-browsing session to discover more.
     // ======================================================================
 
-    // --- Refrigerant circuit sensors (0x07xx block, near LOW_PRESSURE_DISPLAY=0x07a7) ---
-    PROPERTY(UNKNOWN_07A6, 0x07a6);                         // src=Kessel seen=2 raw=1643 (large, maybe runtime counter)
-    PROPERTY(UNKNOWN_07A8, 0x07a8, Type::et_dec_val);       // src=Kessel seen=26 raw=19 → 1.9 (high pressure candidate?)
-    PROPERTY(UNKNOWN_07CA, 0x07ca, Type::et_bool);          // src=Kessel seen=4 raw=0
-    PROPERTY(UNKNOWN_07F2, 0x07f2, Type::et_bool);          // src=Kessel seen=4 raw=0
-    PROPERTY(UNKNOWN_07F3, 0x07f3, Type::et_dec_val);       // src=Kessel seen=4 raw=80 → 8.0
-    PROPERTY(UNKNOWN_07F4, 0x07f4, Type::et_dec_val);       // src=Kessel seen=4 raw=321..324 → 32.1..32.4°C (condenser temp?)
-    PROPERTY(UNKNOWN_07F5, 0x07f5, Type::et_dec_val);       // src=Kessel seen=4 raw=382..383 → 38.2..38.3°C (condenser temp?)
-    PROPERTY(UNKNOWN_07F6, 0x07f6, Type::et_dec_val);       // src=Kessel seen=4 raw=168 → 16.8°C
-    PROPERTY(UNKNOWN_07F7, 0x07f7, Type::et_dec_val);       // src=Kessel seen=4 raw=984..988 → 98.4..98.8
-    PROPERTY(UNKNOWN_07F8, 0x07f8, Type::et_cent_val);      // src=Kessel seen=4 raw=1245 → 12.45
-    PROPERTY(UNKNOWN_07F9, 0x07f9, Type::et_dec_val);       // src=Kessel seen=4 raw=1000 → 100.0
-    PROPERTY(UNKNOWN_07FA, 0x07fa, Type::et_bool);          // src=Kessel seen=4 raw=0
-    PROPERTY(UNKNOWN_07FB, 0x07fb, Type::et_dec_val);       // src=Kessel seen=4 raw=200 → 20.0°C
-    PROPERTY(UNKNOWN_081C, 0x081c, Type::et_bool);          // src=Kessel seen=4 raw=0
+    // --- Refrigerant circuit (0x07xx block, near LOW_PRESSURE_DISPLAY=0x07a7) ---
+    PROPERTY(HIGH_PRESSURE_DISPLAY,   0x07a6, Type::et_dec_val);  // ANZEIGE_HOCHDRUCK — src=Kessel seen=2 raw=1643 (scale/unit TBD)
+    PROPERTY(COMPRESSOR_OUTPUT,       0x07a8, Type::et_dec_val);  // Compressor — src=Kessel seen=26 raw=19 → 1.9 (speed/stage unit TBD)
+    PROPERTY(EXV_OPENING_DEGREE,      0x07ca);                    // EXV_OEFFNUNGSGRAD — Electronic expansion valve position; src=Kessel seen=4 raw=0
+    PROPERTY(HP_OPERATING_MODE,       0x07f2);                    // BETRIEBSART_WP — Heat pump operating mode; src=Kessel seen=4 raw=0
+    PROPERTY(SUPERHEAT_SETPOINT,      0x07f3, Type::et_dec_val);  // SOLLWERT_UEBERHITZUNG — Superheat setpoint; src=Kessel seen=4 raw=80 → 8.0 K
+    PROPERTY(SUPERHEAT_EVAPORATOR,    0x07f4, Type::et_dec_val);  // ISTWERT_UEBERHITZUNG_VERDAMPFER — Evaporator superheat actual; src=Kessel seen=4 raw=321..324 → 32.1..32.4 K
+    PROPERTY(SUPERHEAT_RECUPERATOR,   0x07f5, Type::et_dec_val);  // ISTWERT_UEBERHITZUNG_REKUPERATOR_KUEHLEN — Recuperator superheat (cooling); src=Kessel seen=4 raw=382..383 → 38.2..38.3 K
+    PROPERTY(EXV_FEEDFORWARD,         0x07f6, Type::et_dec_val);  // VORSTEUER_OEFFNUNGSGRAD — EXV feedforward opening degree; src=Kessel seen=4 raw=168 → 16.8 %
+    PROPERTY(EXV_P_TERM,              0x07f7, Type::et_dec_val);  // P_ANTEIL_EXV — EXV P-controller term; src=Kessel seen=4 raw=984..988 → 98.4..98.8
+    PROPERTY(EXV_I_TERM,              0x07f8, Type::et_cent_val); // I_ANTEIL_EXV — EXV I-controller term; src=Kessel seen=4 raw=1245 → 12.45
+    PROPERTY(EXV_D_TERM,              0x07f9, Type::et_dec_val);  // D_ANTEIL_EXV — EXV D-controller term; src=Kessel seen=4 raw=1000 → 100.0
+    PROPERTY(EXV_OSCILLATION,         0x07fa, Type::et_bool);     // PENDELN_RELATIV — Relative oscillation flag; src=Kessel seen=4 raw=0
+    PROPERTY(CONTROL_DYNAMICS_FACTOR, 0x07fb, Type::et_dec_val);  // FAKTOR_REGELDYNAMIK — Control dynamics factor; src=Kessel seen=4 raw=200 → 20.0
+    PROPERTY(UNKNOWN_081C,            0x081c, Type::et_bool);     // src=Kessel seen=4 raw=0
 
-    // --- High-frequency values (0x0b9x block, seen 18-44 times in 5 min) ---
-    PROPERTY(UNKNOWN_0B9A, 0x0b9a, Type::et_dec_val);       // src=Manager seen=44 raw=0..9
-    PROPERTY(UNKNOWN_0B9B, 0x0b9b, Type::et_dec_val);       // src=Kessel seen=18 raw=0..15
-    PROPERTY(UNKNOWN_0B9F, 0x0b9f, Type::et_dec_val);       // src=Kessel seen=20 raw=0..59 (seconds counter?)
-    PROPERTY(UNKNOWN_0BA0, 0x0ba0, Type::et_dec_val);       // src=Kessel seen=23 raw=0..26
-    PROPERTY(UNKNOWN_0BA1, 0x0ba1, Type::et_bool);          // src=Kessel seen=19 raw=0
-    PROPERTY(UNKNOWN_0BA2, 0x0ba2, Type::et_bool);          // src=Kessel seen=20 raw=0
-    PROPERTY(UNKNOWN_0BA3, 0x0ba3, Type::et_dec_val);       // src=Kessel seen=23 raw=0..26
+    // --- Error log readback (0x0b9x — fields of a single error log entry broadcast) ---
+    PROPERTY(ERROR_LOG_INDEX,  0x0b9a); // FEHLERSPEICHER_FELDINDEX — which entry is being broadcast; src=Manager seen=44 raw=0..9
+    PROPERTY(ERROR_LOG_CODE,   0x0b9b); // FEHLERSPEICHER_FEHLERNUMMER — error code number; src=Kessel seen=18 raw=0..15
+    PROPERTY(ERROR_LOG_MINUTE, 0x0b9f); // FEHLERSPEICHER_MINUTE — error timestamp minute; src=Kessel seen=20 raw=0..59
+    PROPERTY(ERROR_LOG_HOUR,   0x0ba0); // FEHLERSPEICHER_STUNDE — error timestamp hour; src=Kessel seen=23 raw=0..23
+    PROPERTY(ERROR_LOG_DAY,    0x0ba1); // FEHLERSPEICHER_TAG — error timestamp day; src=Kessel seen=19 raw=0
+    PROPERTY(ERROR_LOG_MONTH,  0x0ba2); // FEHLERSPEICHER_MONAT — error timestamp month; src=Kessel seen=20 raw=0
+    PROPERTY(ERROR_LOG_YEAR,   0x0ba3); // FEHLERSPEICHER_JAHR — error timestamp year (2-digit); src=Kessel seen=23 raw=0..26 (2026=26)
 
     // --- Active flags and status bits ---
     PROPERTY(UNKNOWN_0060, 0x0060, Type::et_bool);          // src=Kessel seen=2 raw=0
     PROPERTY(UNKNOWN_0067, 0x0067, Type::et_dec_val);       // src=Kessel seen=4 raw=2
     PROPERTY(UNKNOWN_011A, 0x011a, Type::et_bool);          // src=Kessel seen=2 raw=0
     PROPERTY(UNKNOWN_01D3, 0x01d3, Type::et_bool);          // src=Kessel seen=6 raw=0
-    PROPERTY(UNKNOWN_027A, 0x027a, Type::et_bool);          // src=Kessel seen=4 raw=0..1 (varies!)
+    PROPERTY(CLEAR_ERROR_LOG, 0x027a, Type::et_bool);       // GESPEICHERTE_FEHLER_LOESCHEN — write command: clears error log; src=Kessel seen=4 raw=0..1
     PROPERTY(UNKNOWN_02CE, 0x02ce, Type::et_bool);          // src=Kessel seen=2 raw=0
     PROPERTY(UNKNOWN_02F5, 0x02f5, Type::et_bool);          // src=Kessel seen=2 raw=1
     PROPERTY(UNKNOWN_03C1, 0x03c1, Type::et_bool);          // src=Kessel seen=2 raw=1
@@ -234,7 +236,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(UNKNOWN_C0DE, 0xc0de, Type::et_bool);          // src=Kessel seen=2 raw=0
     PROPERTY(UNKNOWN_C113, 0xc113, Type::et_bool);          // src=Kessel seen=2 raw=0
 
-    // --- Heating circuit / pump sensors (0x064x block, near DRUCK_HEIZKREIS=0x064a) ---
+    // --- Heating circuit / pump sensors (0x064x block, near HEATING_CIRCUIT_PRESSURE=0x064a) ---
     PROPERTY(UNKNOWN_0640, 0x0640);                         // src=Kessel seen=2 raw=993
     PROPERTY(UNKNOWN_0641, 0x0641);                         // src=Kessel seen=2 raw=2
     PROPERTY(UNKNOWN_0642, 0x0642);                         // src=Kessel seen=2 raw=795

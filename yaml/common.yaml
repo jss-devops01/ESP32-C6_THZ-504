@@ -164,6 +164,8 @@ interval:
   - interval: $interval_medium
     then:
       - lambda: |-
+          // Poll HEATING_CIRCUIT_PRESSURE — not broadcast spontaneously, must be requested
+          queueRequest(Kessel, Property::kHEATING_CIRCUIT_PRESSURE);
           // Send current ROOM_TEMP_ACTUAL
           const auto room_temp = id(gROOM_TEMP_ACTUAL);
           if(room_temp > 0.0f) {
@@ -333,8 +335,8 @@ canbus:
                 ESP_LOGI("Communication", "Converted value: %.2f (type=et_dec_val)", rawVal * 0.1f);
               }
 
-              // Special highlight for heating circuit pressure (DRUCK_HEIZKREIS)
-              if (property.id == Property::kDRUCK_HEIZKREIS) {
+              // Special highlight for heating circuit pressure (HEATING_CIRCUIT_PRESSURE)
+              if (property.id == Property::kHEATING_CIRCUIT_PRESSURE) {
                 const float pressure_bar = rawVal * 0.1f; // pressures use et_dec_val -> value * 0.1
                 if (pressure_bar < 1.5f) {
                   ESP_LOGW("PRESSURE", "Heating circuit pressure LOW: %.2f bar (expected ~2.0 bar)", pressure_bar);

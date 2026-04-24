@@ -12,24 +12,26 @@ packages:
   FILTER_RUNTIME_DAYS: !include { file: wp_generic.yaml, vars: { property: "FILTER_RUNTIME_DAYS", icon: "mdi:air-filter", unit: "d" , update_interval: $interval_once_in_a_while }}
 
   # ======================================================================
-  # Auto-discovered properties — purpose unconfirmed, rename when identified
+  # Identified properties — cross-referenced against goelster Elster table
   # Run analyze-unknown-properties.ps1 after a menu-browsing session to discover more
   # ======================================================================
 
-  # Refrigerant circuit sensors (block near LOW_PRESSURE_DISPLAY=0x07a7)
-  UNKNOWN_07A8: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07A8", icon: "mdi:gauge",       unit: "bar", update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=26 raw=19 → 1.9 (high pressure display?)
-  UNKNOWN_07F4: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F4", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=321..324 → 32.1..32.4°C
-  UNKNOWN_07F5: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F5", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=382..383 → 38.2..38.3°C
-  UNKNOWN_07F6: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F6", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=168 → 16.8°C
-  UNKNOWN_07F7: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F7", icon: "mdi:gauge",       unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=984..988 → 98.4..98.8
-  UNKNOWN_07F9: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07F9", icon: "mdi:gauge",       unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=1000 → 100.0
-  UNKNOWN_07FB: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_07FB", icon: "mdi:thermometer", unit: "°C",  update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=4 raw=200 → 20.0°C
+  # Refrigerant circuit sensors (identified via goelster/readings.go)
+  HIGH_PRESSURE_DISPLAY:    !include { file: wp_generic.yaml, vars: { property: "HIGH_PRESSURE_DISPLAY",    icon: "mdi:gauge-high",             unit: "bar", update_interval: $interval_slow, accuracy_decimals: "1" }}  # ANZEIGE_HOCHDRUCK — raw=1643 (scale TBD, paired with LOW_PRESSURE_DISPLAY)
+  COMPRESSOR_OUTPUT:        !include { file: wp_generic.yaml, vars: { property: "COMPRESSOR_OUTPUT",        icon: "mdi:engine",                 unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # Compressor — raw=19 → 1.9 (speed/stage unit TBD)
+  SUPERHEAT_EVAPORATOR:     !include { file: wp_generic.yaml, vars: { property: "SUPERHEAT_EVAPORATOR",     icon: "mdi:thermometer-chevron-up", unit: "K",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # ISTWERT_UEBERHITZUNG_VERDAMPFER — raw=321..324 → 32.1..32.4 K
+  SUPERHEAT_RECUPERATOR:    !include { file: wp_generic.yaml, vars: { property: "SUPERHEAT_RECUPERATOR",    icon: "mdi:thermometer-chevron-up", unit: "K",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # ISTWERT_UEBERHITZUNG_REKUPERATOR_KUEHLEN — raw=382..383 → 38.2..38.3 K
+  EXV_FEEDFORWARD:          !include { file: wp_generic.yaml, vars: { property: "EXV_FEEDFORWARD",          icon: "mdi:valve",                  unit: "%",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # VORSTEUER_OEFFNUNGSGRAD — EXV feedforward opening degree — raw=168 → 16.8 %
+  EXV_P_TERM:               !include { file: wp_generic.yaml, vars: { property: "EXV_P_TERM",               icon: "mdi:tune",                   unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # P_ANTEIL_EXV — EXV P-controller term — raw=984..988 → 98.4..98.8
+  EXV_D_TERM:               !include { file: wp_generic.yaml, vars: { property: "EXV_D_TERM",               icon: "mdi:tune",                   unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # D_ANTEIL_EXV — EXV D-controller term — raw=1000 → 100.0
+  CONTROL_DYNAMICS_FACTOR:  !include { file: wp_generic.yaml, vars: { property: "CONTROL_DYNAMICS_FACTOR",  icon: "mdi:chart-bell-curve",       unit: "",    update_interval: $interval_slow, accuracy_decimals: "1" }}  # FAKTOR_REGELDYNAMIK — raw=200 → 20.0
 
-  # High-frequency real-time values (seen 18-44 times per 5 min)
-  UNKNOWN_0B9B: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0B9B", icon: "mdi:help-circle", unit: "",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=18 raw=0..15
-  UNKNOWN_0B9F: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0B9F", icon: "mdi:timer",       unit: "s",  update_interval: $interval_slow, accuracy_decimals: "0" }}  # seen=20 raw=0..59 (seconds timer?)
-  UNKNOWN_0BA0: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0BA0", icon: "mdi:help-circle", unit: "",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=23 raw=0..26
-  UNKNOWN_0BA3: !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_0BA3", icon: "mdi:help-circle", unit: "",   update_interval: $interval_slow, accuracy_decimals: "1" }}  # seen=23 raw=0..26
+  # Error log readback (all fields belong to a single error log entry broadcast by the heat pump)
+  ERROR_LOG_CODE:   !include { file: wp_generic.yaml, vars: { property: "ERROR_LOG_CODE",   icon: "mdi:alert-circle-outline", unit: "", update_interval: $interval_slow, accuracy_decimals: "0" }}  # FEHLERSPEICHER_FEHLERNUMMER — error code; raw=0..15
+  ERROR_LOG_MINUTE: !include { file: wp_generic.yaml, vars: { property: "ERROR_LOG_MINUTE", icon: "mdi:clock-outline",        unit: "", update_interval: $interval_slow, accuracy_decimals: "0" }}  # FEHLERSPEICHER_MINUTE — error timestamp minute; raw=0..59
+  ERROR_LOG_HOUR:   !include { file: wp_generic.yaml, vars: { property: "ERROR_LOG_HOUR",   icon: "mdi:clock-outline",        unit: "", update_interval: $interval_slow, accuracy_decimals: "0" }}  # FEHLERSPEICHER_STUNDE — error timestamp hour; raw=0..23
+  ERROR_LOG_YEAR:   !include { file: wp_generic.yaml, vars: { property: "ERROR_LOG_YEAR",   icon: "mdi:calendar",            unit: "", update_interval: $interval_slow, accuracy_decimals: "0" }}  # FEHLERSPEICHER_JAHR — error timestamp year (2-digit); raw=26=2026
 
-  # Varying active flag (the only bool that changed value during capture)
-  UNKNOWN_027A: !include { file: wp_binary.yaml, vars: { name: "UNKNOWN_027A" }}  # seen=4 raw=0..1
+  # NOTE: UNKNOWN_027A was identified as GESPEICHERTE_FEHLER_LOESCHEN (Delete stored errors).
+  # It is a write command, not a passive sensor — removed from binary sensors.
+  # To clear the error log from HA, use the can_send_value action: property=0x027a, target=Kessel, raw_value=1

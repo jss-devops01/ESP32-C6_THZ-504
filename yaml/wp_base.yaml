@@ -57,14 +57,14 @@ esphome:
           });
           scheduleRequest(Kessel, Property::kPROGRAM_SWITCH, std::chrono::seconds(10));
 
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS_2),[](const SimpleVariant& value){
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kOPERATING_STATUS_2),[](const SimpleVariant& value){
             const std::bitset<2U> status_bits{static_cast<std::uint16_t>(value)};
             id(SUMMER_MODE_ACTIVE).publish_state(status_bits.test(0U));
             id(STOVE_FIREPLACE_ACTIVE).publish_state(status_bits.test(1U));
           });
-          scheduleRequest(Kessel, Property::kBETRIEBS_STATUS_2, std::chrono::seconds(10));
+          scheduleRequest(Kessel, Property::kOPERATING_STATUS_2, std::chrono::seconds(10));
 
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kOPERATING_STATUS),[](const SimpleVariant& value){
             const std::bitset<15U> status_bits{static_cast<std::uint16_t>(value)};
             id(SWITCH_PROGRAM_ACTIVE).publish_state(status_bits.test(0U));
             id(COMPRESSOR).publish_state(status_bits.test(1U));
@@ -82,10 +82,10 @@ esphome:
             id(FILTER_CHANGE_SUPPLY).publish_state(status_bits.test(13U));
             id(HEATUP_PROGRAM_ACTIVE).publish_state(status_bits.test(14U));
           });
-          scheduleRequest(Kessel, Property::kBETRIEBS_STATUS, std::chrono::seconds(10));
+          scheduleRequest(Kessel, Property::kOPERATING_STATUS, std::chrono::seconds(10));
 
-          // Force regular updates for DRUCK_HEIZKREIS (heating circuit pressure)
-          scheduleRequest(Manager, Property::kDRUCK_HEIZKREIS, std::chrono::seconds(30));
+          // Force initial request for HEATING_CIRCUIT_PRESSURE — periodic poll is in common.yaml interval
+          scheduleRequest(Kessel, Property::kHEATING_CIRCUIT_PRESSURE, std::chrono::seconds(30));
 
 #########################################
 #                                       #
@@ -169,7 +169,7 @@ climate:
   - platform: custom
     lambda: |-
       auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_DAY), id(HEATING), id(COOLING), id(VENTILATION), Property::kROOM_TEMP_SETPOINT_DAY, Property::kCOOLING_ROOM_SETPOINT_DAY);
-      App.register_component(heating);
+      App.register_component_(heating);
       return {heating};
     climates:
       name: "Heating Day"
@@ -182,8 +182,8 @@ climate:
 
   - platform: custom
     lambda: |-
-      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_NIGHT), id(HEATING), id(COOLING), id(VENTILATION), Property::kROOM_TEMP_SETPOINT_NIGHT, Property::kKUEHL_RAUMSOLL_NACHT);
-      App.register_component(heating);
+      auto heating = new Heating(id(ROOM_TEMP_ACTUAL),id(ROOM_TEMP_SETPOINT_NIGHT), id(HEATING), id(COOLING), id(VENTILATION), Property::kROOM_TEMP_SETPOINT_NIGHT, Property::kCOOLING_ROOM_SETPOINT_NIGHT);
+      App.register_component_(heating);
       return {heating};
     climates:
       name: "Heating Night"
@@ -197,7 +197,7 @@ climate:
   - platform: custom
     lambda: |-
       auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(STORAGE_TEMP_SETPOINT_DAY), id(DHW_HEATING), Property::kSTORAGE_TEMP_SETPOINT_DAY);
-      App.register_component(hot_water);
+      App.register_component_(hot_water);
       return {hot_water};
     climates:
       name: "Hot Water Day"
@@ -211,7 +211,7 @@ climate:
   - platform: custom
     lambda: |-
       auto hot_water = new HotWater(id(STORAGE_TEMP_ACTUAL),id(STORAGE_TEMP_SETPOINT_NIGHT), id(DHW_HEATING), Property::kSTORAGE_TEMP_SETPOINT_NIGHT);
-      App.register_component(hot_water);
+      App.register_component_(hot_water);
       return {hot_water};
     climates:
       name: "Hot Water Night"
@@ -231,7 +231,7 @@ interval:
   - interval: $interval_once_in_a_while
     then:
     - lambda: |-
-        queueRequest(Kessel, Property::kBETRIEBS_STATUS_2);
+        queueRequest(Kessel, Property::kOPERATING_STATUS_2);
 
 #########################################
 #                                       #
@@ -287,7 +287,7 @@ packages:
   VOLUME_FLOW:                         !include { file: wp_generic.yaml, vars: { property: "VOLUME_FLOW"              , update_interval: $interval_slow            , unit: "l/min", icon: "mdi:pump"  }}
   FILTER_RUNTIME:                      !include { file: wp_generic.yaml, vars: { property: "FILTER_RUNTIME"          , update_interval: $interval_once_in_a_while , unit: "%"    , icon: "mdi:calendar"  }}
   LOW_PRESSURE_DISPLAY:                !include { file: wp_generic.yaml, vars: { property: "LOW_PRESSURE_DISPLAY"      , accuracy_decimals: "2" }}
-  DRUCK_HEIZKREIS:                     !include { file: wp_generic.yaml, vars: { property: "DRUCK_HEIZKREIS"           , accuracy_decimals: "2", unit: "bar", scaler: "1.0" }}
+  HEATING_CIRCUIT_PRESSURE:                     !include { file: wp_generic.yaml, vars: { property: "HEATING_CIRCUIT_PRESSURE"           , accuracy_decimals: "2", unit: "bar", scaler: "1.0" }}
   UNKNOWN_019A:                        !include { file: wp_generic.yaml, vars: { property: "UNKNOWN_019A"              , accuracy_decimals: "2", scaler: "1.0" }}
 
   # Note: Many additional properties (like DRUCK_HOCHDRUCK, DRUCK_NIEDERDRUCK, QUELLE_IST, QUELLENTEMP_MIN, PUFFERISTTEMP, 
@@ -325,7 +325,7 @@ packages:
   COOLING_MODE:                        !include { file: wp_switch.yaml, vars: { property: "COOLING_MODE" , target: "HK1" }}
 
   # Additional sensors originally from common.yaml to avoid duplicates
-  COMPRESSOR_STARTS:                   !include { file: wp_generic_combined.yaml, vars: { sensor_name: "COMPRESSOR_STARTS"           , scaled_property: "VERDICHTER_STARTS_K"       , property: "COMPRESSOR_STARTS"         , unit: ""   , accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
+  COMPRESSOR_STARTS:                   !include { file: wp_generic_combined.yaml, vars: { sensor_name: "COMPRESSOR_STARTS"           , scaled_property: "COMPRESSOR_STARTS_KILO"       , property: "COMPRESSOR_STARTS"         , unit: ""   , accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
   HEAT_OUTPUT_DHW_TOTAL_MWH:           !include { file: wp_generic_combined.yaml, vars: { sensor_name: "HEAT_OUTPUT_DHW_TOTAL_MWH"   , scaled_property: "HEAT_OUTPUT_DHW_TOTAL_KWH"   , property: "HEAT_OUTPUT_DHW_TOTAL_MWH"   , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
   HEAT_OUTPUT_HEATING_TOTAL_MWH:       !include { file: wp_generic_combined.yaml, vars: { sensor_name: "HEAT_OUTPUT_HEATING_TOTAL_MWH" , scaled_property: "HEAT_OUTPUT_HEATING_TOTAL_KWH" , property: "HEAT_OUTPUT_HEATING_TOTAL_MWH" , unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
 
